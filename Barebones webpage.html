@@ -1,15 +1,59 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>eFind</title>
+<head>
+    <title>eFind - Find Your Research</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+        }
+        h1 {
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input[type="text"], input[type="submit"] {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
         <h1>Welcome to eFind</h1>
-    </head>
-    <body>
-        <p>
-            Please enter prompt.
-        </p>
+    </header>
+    <div class="container">
+        <p>Please enter your research topic:</p>
         <form action="user-save.php" method="post">
-            <p>Research topic: <input type="text" name="name"/></p>
-            <p><input type="submit" name="action" value="Send"/>
+            <input type="text" name="name" placeholder="Research topic" required/>
+            <br>
+            <input type="submit" name="action" value="Send"/>
         </form>
-    </body>
+    </div>
+</body>
 </html>
