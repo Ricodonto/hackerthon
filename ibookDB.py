@@ -1,4 +1,4 @@
-import panda as pd
+import pandas as pd
 
 #Load the datasetinto a dataframe
 df = pd.read_csv("books.csv")
