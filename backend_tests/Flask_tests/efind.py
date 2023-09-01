@@ -6,7 +6,7 @@ efind = Blueprint(__name__, 'efind')
 
 @efind.route('/')
 def home():
-    return 'Homepage'
+    return render_template('barebones_with_api.html')
 
 @efind.route('/prompt')
 def prompt():
