@@ -1,13 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-        <head><meta charset="UTF-8">
-        <title>BookFinder</title>
-        </head>      
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="styles.css"> <!-- Link to CSS file -->
+            <title>BookFinder</title>
+        </head>
         <body>
-        <div id = "navbar"> 
-        <h2 style="font-size:75%;">BOOKFINDER</h2>
-        <h3 style="font-size:75%;"><a href="http://127.0.0.1:5000/">Home</a>    <a href="http://127.0.0.1:5000/about">About</a></h3>
+            <header>
+                <h1>BookFinder</h1>
+            </header>
+            <main>
+                {% block content %}{% endblock %}
+            </main>
+            <div id = "navbar"> 
+                <h3 style="font-size:75%;"><a href="http://127.0.0.1:5000/">Home</a></h3>
+                <h3 style="font-size:75%;"><a href="http://127.0.0.1:5000/about">About</a></h3>
         </div> 
-        {%block content%}{%endblock%}     
-        </body>        
+            <footer>
+                &copy; 2023 BookFinder.
+            </footer>
+        </body>
         </html>
+        
