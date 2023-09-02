@@ -46,5 +46,5 @@ footer {
     text-align: center;
     position: absolute; /* Position the footer at the bottom */
     width: 100%; /* Make the footer full width */
-    bottom: 0; /* Stick it to the bottom */
+    bottom: 0; /* Sticks it to the bottom */
 }
