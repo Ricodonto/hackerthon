@@ -27,11 +27,11 @@ def prompt_entry():
         #ai(prompt) is the answers gpt gave and the "result" is the key
         response["result"] = ai(prompt)
 
-        # count = 0
-        # for dict in response["result"]:
-        #     count = count + 1
-        #     keyname = "book" + str(count)
-        #     response[keyname] = dict
+        count = 0
+        for dict in response["result"]:
+            count = count + 1
+            keyname = "book" + str(count)
+            response[keyname] = dict
         
         return render_template('response.html', response=response)
     
