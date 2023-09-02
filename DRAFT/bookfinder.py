@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template,redirect, request
+from flask import Blueprint, render_template, request
 from form import PromptForm
 from test import ai
+
 
 bookfinder = Blueprint(__name__, 'bookfinder')
 
