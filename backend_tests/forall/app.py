@@ -1,7 +1,3 @@
-import os
-from dotenv import load_dotenv
-load_dotenv(".env")
-
 from flask import Flask
 from efind import efind
 
@@ -10,7 +6,7 @@ app = Flask(__name__)
 #Setting a secret key
 
 #Generate random string and replace 'test'
-app.config['SECRET_KEY'] = os.getenv("CONFIG_KEY")
+app.config['SECRET_KEY'] = 'shazzy'
 
 app.register_blueprint(efind, url_prefix="/app")
 
