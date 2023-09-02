@@ -6,6 +6,7 @@ def ai(prompt):
         message = []
         if len(message) == 0:
             check = False
+            ###  REMOVE THE API KEY FROM HERE!
             openai.api_key = "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"
 
             completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}])
