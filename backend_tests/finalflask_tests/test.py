@@ -1,14 +1,16 @@
 import openai
 
-check = True
-while check == True:
-    message = []
-    if len(message) == 0:
-        check = False
-        openai.api_key = "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"
+def ai(prompt):
+    check = True
+    while check == True:
+        message = []
+        if len(message) == 0:
+            check = False
+            openai.api_key = "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"
 
-        completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": "Give me 3 ideas for apps I could build with openai apis "}])
-        message.append(completion.choices[0].message.content)
+            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}])
+            message.append(completion.choices[0].message.content)
+    return message[0]
 
-#
-print(message[0])
+if __name__ == '__main__':
+    print(ai("how are you?"))
