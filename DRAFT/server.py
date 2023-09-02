@@ -1,11 +1,15 @@
 from flask import Flask,render_template,request
 from form import PromptForm
 from test import ai
+from bookfinder import bookfinder
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'shazzy'
+app.register_blueprint(bookfinder, url_prefix="/")
 
-@app.route('/')
+
+"""@app.route('/')
 def home():
     return "HOME PAGE"
 
@@ -28,7 +32,7 @@ def prompt_entry():
         
         return render_template('response.html', result=response)
     
-    return render_template('landing_page.html', form=form)
+    return render_template('landing_page.html', form=form)"""
 
 if __name__ == "__main__":
     app.run(debug=True,port=5000)
