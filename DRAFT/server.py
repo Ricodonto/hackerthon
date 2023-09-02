@@ -1,5 +1,6 @@
 from flask import Flask,render_template,request
 from form import PromptForm
+from test import ai
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'shazzy'
@@ -20,7 +21,12 @@ def prompt_entry():
     form = PromptForm()
     if form.is_submitted():
         result = request.form
-        return render_template('response.html',result=result)
+        prompt = result["prompt"]
+        response = {}
+        response["prompt"] = prompt
+        response["result"] = ai(prompt)
+        
+        return render_template('response.html', result=response)
     
     return render_template('landing_page.html', form=form)
 
