@@ -19,8 +19,8 @@ efind = Blueprint(__name__, 'efind')
 # #You can specify the datatype by adding <datatype:rule> e.g <intg:prompt_id> 
 # #It then acts like a variable in python 
 # #I don't know why you can't use string
-# @efind.route('/prompt/<string:prompt_id>')
-# def prompt_page(prompt_id):
+#@efind.route('/prompt/<string:prompt_id>')
+#def prompt_page(prompt_id):
 #     return 'This is the ' + str(prompt_id)
 
 # #Render template allows you to load html files

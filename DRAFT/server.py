@@ -25,4 +25,4 @@ def prompt_entry():
     return render_template('landing_page.html', form=form)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True,port=5000)

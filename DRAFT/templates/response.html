@@ -1,6 +1,7 @@
 {% extends "base_template.html"%}
-
-{% for key, value in result.items() %}
+{% block content %}
+<table border="1">
+    {% for key, value in result.items() %}
     <tr>
         <th>
             {{key}}
@@ -9,8 +10,8 @@
             {{value}}
         </td>
     </tr>
-{% endfor %}
-
+    {% endfor %}
+</table>
 
 {% endblock %}
-{% block content %}
+
