@@ -6,6 +6,7 @@ def ai(p):
      {"title":"Eloquent JavaScript: A Modern Introduction to Programming", "author":"Marijn Haverbeke", "isbn":"9781593275846", "rating":"4.5/5" },
      {"title":"Eloquent JavaScript: A Modern Introduction to Programming", "author":"Marijn Haverbeke", "isbn":"9781593275846", "rating":"4.5/5" },
      ]
+    old = [{"prompt":"how are you","response": "Fine, would you need a service?"}]
     
     return message
 if __name__ == '__main__':
