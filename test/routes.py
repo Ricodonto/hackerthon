@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from forms import PromptForm
 from chatgpt import ai, cleanup
+
+
 import os
 from pathlib import Path
 
@@ -37,4 +39,4 @@ def about():
 
 @routes.route("/response")
 def response():
-    return render_template("response.html")
+    return render_template("book_table.html",)

@@ -1,0 +1,27 @@
+{%extends "base_template.html"%}
+{%block content%}
+
+    <h1>Book Details</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Ratings</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in details %}
+                <tr>
+                    <td>{{ details.title }}</td>
+                    <td>{{ details.author }}</td>
+                    <td>{{ details.isbn }}</td>
+                    <td>{{ details.rating }}</td>
+                    <td>{{ details.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{%endblock%}

@@ -1,17 +1,48 @@
 {% extends "base_template.html"%}
 {% block content %}
-<table border="1">
-    {% for key, value in response.items() %}
-    <tr>
-        <th>
-            {{key}}
-        </th>
-        <td>
-            {{value}}
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+
+<body>
+    <h1>Book Details</h1>
+    <form action="" method="post">
+        <p> {{form.Title.label}} <br>
+            {{form.Title(size=30)}}
+        </p>
+        <p> {{form.Author.label}} <br>
+            {{form.Author(size=30)}}
+        </p>
+        <p> {{form.ISBN.label}} <br>
+            {{form.ISBN(size=30)}}
+        </p>
+        <p> {{form.Ratings.label}} <br>
+            {{form.Ratings(size=30)}}
+        </p>
+        <p> {{form.Description.label}} <br>
+            {{form.Description(size=30)}}
+        </p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>ISBN</th>
+                <th>Ratings</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in details %}
+                <tr>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.isbn }}</td>
+                    <td>{{ book.rating }}</td>
+                    <td>{{ book.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
 
 {% endblock %}
 

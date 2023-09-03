@@ -36,7 +36,7 @@ def ai(prompt):
     file.write(message[0])
     file.close()
 
-def cleanup():
+def cleanup ():
     with open("response.txt", "r") as file:
         lines = file.readlines()
         print("Response Loaded")
@@ -88,9 +88,19 @@ def cleanup():
             description = matches.group(1)
             descriptions.append(description)
             
-    details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":description}
-
-
+    #details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":description}
+    details = []
+    
+    for i in range(len(titles)):
+        book = {
+            "title": titles[i],
+            "author": authors[i],
+            "isbn": isbns[i],
+            "rating": ratings[i],
+            "description": descriptions[i]
+        }
+        details.append(book)
+        
     return details
 
 
