@@ -4,12 +4,12 @@ load_dotenv('.env')
 
 import openai
 
-def main():
-    user_input = input("Enter prompt, e.g What book should I read to learn javascript ")
-    user_input = user_input + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK and don't recommend series"
-    ai(user_input)
-    details = cleanup()
-    print(details)
+# def main():
+#     user_input = input("Enter prompt, e.g What book should I read to learn javascript ")
+#     user_input = user_input + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK and don't recommend series"
+#     ai(user_input)
+#     details = cleanup()
+#     print(details)
 
 
 
@@ -50,7 +50,6 @@ def cleanup():
             titledict = title
             titles.append(titledict)
         
-    print(f"{len(titles)} -- Titles" )
 
     
     authors = []
@@ -61,8 +60,6 @@ def cleanup():
             author = matches.group(1)
             authors.append(author)
 
-
-    print(f"{len(authors)} -- Authors")
 
     isbns = []
     for line in lines:
@@ -84,7 +81,6 @@ def cleanup():
             ratings.append(rating)
 
 
-    print(f"{len(ratings)} -- Ratings")
 
     descriptions = []
     for line in lines:
@@ -102,4 +98,5 @@ def cleanup():
 
 
 if __name__ == '__main__':
-    main()
+    print(ai("What books should I read if I want to learn javascript"))
+    #main()
