@@ -13,6 +13,3 @@ app.config['SECRET_KEY'] = os.getenv("CONFIG_KEY")
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-app.static_url_path = '/static'
