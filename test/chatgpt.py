@@ -12,8 +12,11 @@ def ai(prompt):
             check = False
             openai.api_key = os.getenv("OPENAI_API_KEY")
 
-            # Make the gpt ask the user questions on what on they want
-            completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}])
+            completion = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                # Figure out whether you wanna give the assistant a role
+                messages=[
+                    {"role": "user", "content": prompt}])
             message.append(completion.choices[0].message.content)
     return message[0]
 
