@@ -17,3 +17,28 @@
 
 /tempCodeRunnerFile.python - Sets up a Flask web application with a single route(“/”). When you run the the script it starts a local web server that accesses the homepage.
 Generative AI would generate the list of recommended books and their details based on the user’s prompt
+
+/test/chatgpt.py - It takes the user's prompt and queries the openai api (under the ai() function) it then writes a temporary file called "response.txt" which gives out its messages.
+The function cleanup then loads "response.txt" and searches for particular data such as the book title, isbn, rating etc, and returns an easier to work with piece of data"\
+This data will be used in the routes.py folder
+
+/test/routes.py - this is the file that holds the routes of our Service page, where flask would create a web api that would be hosted by a webservice provider
+
+at the landing page, the user would be prompted with a form containing their prompt information that would be sumbmitted to the server (for processing and message generation). forwd_prompt variable is the string that would be submitted to the ai, it has an concatenated string that tells the ai to provide additional information about the books
+
+The forwd prompt is then submitted and the user prompt is stored in a dictionary
+
+The information is then rendered onto a html folder that takes advantage of Jinja
+
+/test/forms.py It is the implementation of forms using Flask
+
+/test/templates The folder stores the html pages that would be rendered
+
+/test/templates/about.html It has information about us
+
+/test/templates/base_template.html It has attributes that would be inherited by other html files
+
+/test/templates/book_table.html - This is the html page that would be showed to the user after they submit their prompt, The data at the moment is kept in a table
+
+/test/templates/response.html - Older method of showing the book details to the user
+
