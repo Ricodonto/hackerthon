@@ -10,10 +10,10 @@ def landing():
     if form.is_submitted():
         result = request.form
         response = {}
-        prompt = str(result["prompt"])
-        prompt = prompt + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK"
-        response["prompt"] = prompt
-        response["response"] = ai(prompt)
+        usrprompt = str(result["prompt"])
+        forwd_prompt = usrprompt + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK"
+        response["prompt"] = usrprompt
+        response["response"] = ai(forwd_prompt)
 
 
         return render_template("response.html", response=response)
