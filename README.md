@@ -1,6 +1,8 @@
 /backend_tests - it comprises of the files and folders that were used while testing out the backend
 
-/DRAFT - it holds the files and folders that were used while wrapping up the backend
+/DRAFT - previous imlementations of bookfinder
+
+/newdraft - previous imlementations of bookfinder
 
 .gitignore - to hold sensitive information
 
