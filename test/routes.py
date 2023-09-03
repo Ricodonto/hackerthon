@@ -1,11 +1,21 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from forms import PromptForm
+from chatgpt import ai
 
 routes = Blueprint(__name__,"route")
 
-@routes.route("/")
-def page():
-    return render_template("page.html")
+@routes.route("/", methods=['GET', 'POST'])
+def landing():
+    form = PromptForm()
+    if form.is_submitted():
+        result = request.form
+        response = {}
+        response["prompt"] = result["prompt"]
+        response["response"] = ai(result["prompt"])
+
+        return render_template("response.html", response=response)
+
+    return render_template("landing_page.html", form=form)
 
 @routes.route("/base")
 def base():
@@ -15,10 +25,6 @@ def base():
 def about():
     return render_template("about.html")
 
-@routes.route("/landing")
-def landing():
-    form = PromptForm()
-    return render_template("landing_page.html", form=form)
 
 @routes.route("/response")
 def response():
