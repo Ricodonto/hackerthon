@@ -107,4 +107,5 @@ def cleanup ():
 
 if __name__ == '__main__':
     print(ai("What book should I read to learn java"))
+    print(cleanup())
     # main()

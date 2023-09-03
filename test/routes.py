@@ -39,4 +39,4 @@ def about():
 
 @routes.route("/response")
 def response():
-    return render_template("book_table.html",)
+    return render_template("book_table.html")

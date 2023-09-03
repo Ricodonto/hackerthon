@@ -15,11 +15,11 @@
         <tbody>
             {% for book in details %}
                 <tr>
-                    <td>{{ details.title }}</td>
-                    <td>{{ details.author }}</td>
-                    <td>{{ details.isbn }}</td>
-                    <td>{{ details.rating }}</td>
-                    <td>{{ details.description }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author.author }}</td>
+                    <td>{{ book.isbn }}</td>
+                    <td>{{ book.rating }}</td>
+                    <td>{{ book.description }}</td>
                 </tr>
             {% endfor %}
         </tbody>
