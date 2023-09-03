@@ -1,10 +1,11 @@
 from flask import Flask, render_template
+from routes import routes
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "test"
+app.register_blueprint(routes, url_prefix="/")
 
-@app.route("/")
+"""@app.route("/")
 def page():
     return render_template("page.html")
 
@@ -22,7 +23,7 @@ def landing():
 
 @app.route("/response")
 def response():
-    return render_template("response.html")
+    return render_template("response.html")"""
 
 if __name__ == '__main__':
     app.run(debug=True)
