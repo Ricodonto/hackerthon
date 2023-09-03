@@ -13,13 +13,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for book in details %}
+            {% for i in range(details['author'] | length) %}
                 <tr>
-                    <td>{{ book.title }}</td>
-                    <td>{{ book.author.author }}</td>
-                    <td>{{ book.isbn }}</td>
-                    <td>{{ book.rating }}</td>
-                    <td>{{ book.description }}</td>
+                    <td>{{ details['title'][i] }}</td>
+                    <td>{{ details['author'][i] }}</td>
+                    <td>{{ details['isbn'][i] }}</td>
+                    <td>{{ details['ratings'][i] }}</td>
+                    <td>{{ details['description'][i] }}</td>
+                    <!-- <td>{{ i }}</td>
+                    <td>{{ i }}</td>
+                    <td>{{ i }}</td>
+                    <td>{{ i }}</td>
+                    <td>{{ i }}</td> -->
                 </tr>
             {% endfor %}
         </tbody>

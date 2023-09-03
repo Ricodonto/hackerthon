@@ -23,8 +23,8 @@ def landing():
         if os.path.isfile("response.txt"):
             os.remove("response.txt")
 
-
-        return array_response
+        # return array_response
+        return render_template("book_table.html", details=array_response)
 
     return render_template("landing_page.html", form=form)
 
