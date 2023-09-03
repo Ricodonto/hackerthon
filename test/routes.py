@@ -15,6 +15,7 @@ def landing():
         response["prompt"] = prompt
         response["response"] = ai(prompt)
 
+
         return render_template("response.html", response=response)
 
     return render_template("landing_page.html", form=form)
