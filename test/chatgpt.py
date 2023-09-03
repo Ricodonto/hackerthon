@@ -8,9 +8,9 @@ def ai(prompt):
                 "description":["This book offers a collection of practical recipes for solving various SQL problems and challenges. It covers a wide range of topics, including database design, querying data, optimizing performance, and troubleshooting common issues",
                 "This book offers a collection of practical recipes for solving various SQL problems and challenges. It covers a wide range of topics, including database design, querying data, optimizing performance, and troubleshooting common issues",
                 "This book offers a collection of practical recipes for solving various SQL problems and challenges. It covers a wide range of topics, including database design, querying data, optimizing performance, and troubleshooting common issues"]}
-    colnames=["title","author","rating","description"]
-    rows = zip(*[messages[c] for c in colnames])
-    return dict(rows=rows,colnames=colnames)
+    keys = messages.keys()
+    values = messages.values()
+    return keys,values
 
 if __name__ == '__main__':
     print(ai("how are you?"))
