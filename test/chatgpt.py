@@ -4,12 +4,12 @@ load_dotenv('.env')
 
 import openai
 
-# def main():
-#     user_input = input("Enter prompt, e.g What book should I read to learn javascript ")
-#     user_input = user_input + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK and don't recommend series"
-#     ai(user_input)
-#     details = cleanup()
-#     print(details)
+def main():
+    user_input = input("Enter prompt, e.g What book should I read to learn javascript ")
+    user_input = user_input + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK and don't recommend series"
+    ai(user_input)
+    details = cleanup()
+    print(details)
 
 
 
@@ -27,7 +27,7 @@ def ai(prompt):
                 
                 # Change if giving it starts not giving isbn
                 temperature = 0.1,
-                messages=[
+                messages=[{"role":"system", "content":"The user will as for a book suggestion, and you will give them the title, author, description, isbn code and average rating of that book"},
                     {"role": "user", "content": prompt}])
             message.append(completion.choices[0].message.content)
     
@@ -36,7 +36,7 @@ def ai(prompt):
     file.write(message[0])
     file.close()
 
-def cleanup ():
+def cleanup():
     with open("response.txt", "r") as file:
         lines = file.readlines()
         print("Response Loaded")
@@ -50,7 +50,9 @@ def cleanup ():
             titledict = title
             titles.append(titledict)
         
+    print(f"{len(titles)} -- Titles" )
 
+    
     authors = []
     for line in lines:
         line = line.rstrip()
@@ -59,6 +61,8 @@ def cleanup ():
             author = matches.group(1)
             authors.append(author)
 
+
+    print(f"{len(authors)} -- Authors")
 
     isbns = []
     for line in lines:
@@ -80,6 +84,8 @@ def cleanup ():
             ratings.append(rating)
 
 
+    print(f"{len(ratings)} -- Ratings")
+
     descriptions = []
     for line in lines:
         line = line.rstrip()
@@ -88,24 +94,12 @@ def cleanup ():
             description = matches.group(1)
             descriptions.append(description)
             
-    #details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":description}
-    details = []
-    
-    for i in range(len(titles)):
-        book = {
-            "title": titles[i],
-            "author": authors[i],
-            "isbn": isbns[i],
-            "rating": ratings[i],
-            "description": descriptions[i]
-        }
-        details.append(book)
-        
+    details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":description}
+
+
     return details
 
 
 
 if __name__ == '__main__':
-    print(ai("What book should I read to learn java"))
-    print(cleanup())
-    # main()
+    main()
