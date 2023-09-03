@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template
+from forms import PromptForm
 
 routes = Blueprint(__name__,"route")
 
@@ -16,7 +17,8 @@ def about():
 
 @routes.route("/landing")
 def landing():
-    return render_template("landing_page.html")
+    form = PromptForm()
+    return render_template("landing_page.html", form=form)
 
 @routes.route("/response")
 def response():
