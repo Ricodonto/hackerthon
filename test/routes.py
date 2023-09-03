@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request
 from forms import PromptForm
-from chatgpt import ai
+from chatgpt import ai, cleanup
+import os
+from pathlib import Path
 
 routes = Blueprint(__name__,"route")
 
@@ -13,10 +15,14 @@ def landing():
         usrprompt = str(result["prompt"])
         forwd_prompt = usrprompt + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK"
         response["prompt"] = usrprompt
-        response["response"] = ai(forwd_prompt)
+        response = ai(forwd_prompt)
+        array_response = cleanup()
+
+        if os.path.isfile("response.txt"):
+            os.remove("response.txt")
 
 
-        return render_template("response.html", response=response)
+        return array_response
 
     return render_template("landing_page.html", form=form)
 
