@@ -50,9 +50,7 @@ def cleanup():
             titledict = title
             titles.append(titledict)
         
-    print(f"{len(titles)} -- Titles" )
 
-    
     authors = []
     for line in lines:
         line = line.rstrip()
@@ -61,8 +59,6 @@ def cleanup():
             author = matches.group(1)
             authors.append(author)
 
-
-    print(f"{len(authors)} -- Authors")
 
     isbns = []
     for line in lines:
@@ -83,8 +79,6 @@ def cleanup():
             rating = matches.group(1)
             ratings.append(rating)
 
-
-    print(f"{len(ratings)} -- Ratings")
 
     descriptions = []
     for line in lines:
