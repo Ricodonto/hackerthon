@@ -12,8 +12,7 @@ def ai(prompt):
         if len(message) == 0:
             check = False
             ###  REMOVE THE API KEY FROM HERE!
-            openai.api_key = "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"
-
+            openai.api_key = os.getenv("OPENAI_API_KEY")
             # Make the gpt ask the user questions on what on they want
             completion = openai.ChatCompletion.create(model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}])
             message.append(completion.choices[0].message.content)
