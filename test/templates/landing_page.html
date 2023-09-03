@@ -3,12 +3,13 @@
 {% block content %}
 
 
-<h2 style="font-size:200%;"><b>PLEASE ENTER YOUR PROMPT BELOW</b></h2>
-    <p>What kind of book would you like? </p>
+<h2 style="font-size:200%;"><b>WHAT BOOK WOULD YOU LIKE US TO RECOMMEND?</b></h2>
+    
 <form action="" method="post">
     <p> {{form.prompt.label}} <br>
         {{form.prompt(size=30)}}
     </p>
+    
     <p>{{form.submit()}}</p>
 </form>
 
