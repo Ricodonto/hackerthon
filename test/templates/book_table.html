@@ -5,26 +5,24 @@
     <table border="1">
         <thead>
             <tr>
+                <th>Book Image</th>   
                 <th>Title</th>
                 <th>Author</th>
                 <th>ISBN</th>
                 <th>Ratings</th>
                 <th>Description</th>   
-                <th>Book Image</th>           
-                
+        
             </tr>
         </thead>
         <tbody>
             {% for i in range(details['author'] | length) %}
                 <tr>
+                    <td><img src="{{ details['images'][i] }}" alt="No image"></td>
                     <td>{{ details['title'][i] }}</td>
                     <td>{{ details['author'][i] }}</td>
                     <td>{{ details['isbn'][i] }}</td>
                     <td>{{ details['ratings'][i] }}</td>
                     <td>{{ details['description'][i] }}</td>
-                    <td><img src="{{ details['images'][i] }}" alt=""></td>
-
-                    
                     <!-- <td>{{ i }}</td>
                     <td>{{ i }}</td>
                     <td>{{ i }}</td>
