@@ -26,8 +26,9 @@ def ai(prompt):
                 # Figure out whether you wanna give the assistant a role
                 
                 # Change if giving it starts not giving isbn
-                temperature = 0.1,
-                messages=[{"role":"system", "content":"The user will as for a book suggestion, and you will give them the title, author, description, isbn code and average rating of that book"},
+                temperature = 0.0,
+                messages=[{"role":"system", "content":"do not contain a series of books"},
+                    {"role":"system", "content":"only contain the title, isbn, descrition, author and ratings for each book and use colons"},
                     {"role": "user", "content": prompt}])
             message.append(completion.choices[0].message.content)
     
@@ -43,20 +44,19 @@ def cleanup():
     titles = []
     for line in lines:
         line = line.rstrip()
-
-        if matches := re.match(r".{3}\"([^\"]+)\"", line, re.IGNORECASE):
+        if matches := re.search(r"Title: (.+)$", line, re.IGNORECASE):
             title = matches.group(1)
             titledict = {}
             titledict = title
             titles.append(titledict)
-        
 
-    
+    # Sample output is [{'title': 'Eloquent JavaScript: A Modern Introduction to Programming'}, {'title': 'JavaScript: The Good Parts'}, {'title': "You Don't Know JS"}, {'title': 'JavaScript: The Definitive Guide'}, {'title': 'Head First JavaScript Programming'}]
+
     authors = []
     for line in lines:
         line = line.rstrip()
 
-        if matches := re.search(r"by (.+)$", line, re.IGNORECASE):
+        if matches := re.search(r"Author: (.+)$", line, re.IGNORECASE):
             author = matches.group(1)
             authors.append(author)
 
@@ -65,21 +65,27 @@ def cleanup():
     for line in lines:
         line = line.rstrip()
 
-        if matches := re.search(r"([0-9\-]{13,14})", line, re.IGNORECASE):
+        if matches := re.search(r"ISBN: ([0-9\-]+)$", line, re.IGNORECASE):
             isbn = matches.group(1)
-            isbn = isbn.replace("-","")
+            isbn = isbn.replace("-", "")
             isbns.append(isbn)
 
+    if len(isbns) == 0:
+        for line in lines:
+            line = line.rstrip()
+
+            if matches := re.search(r"ISBN(-)?(13)?: (.+)$", line, re.IGNORECASE):
+                isbn = matches.group(1)
+                isbns.append(isbn)
 
 
     ratings = []
     for line in lines:
         line = line.rstrip()
 
-        if matches := re.search(r"Average Rating: ([0-9./]+)", line, re.IGNORECASE):
+        if matches := re.search(r"Ratings: ([0-9./]+)$", line, re.IGNORECASE):
             rating = matches.group(1)
             ratings.append(rating)
-
 
 
     descriptions = []
@@ -89,14 +95,18 @@ def cleanup():
         if matches := re.search(r"Description: (.+)$", line, re.IGNORECASE):
             description = matches.group(1)
             descriptions.append(description)
-            
-    details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":description}
 
+    images = []
+    for isbn in isbns:
+        imageurl = f"https://covers.openlibrary.org/b/isbn/{isbn}.jpg"
+        images.append(imageurl)
 
+    details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":descriptions, "images":images}
     return details
 
 
 
 if __name__ == '__main__':
-    print(ai("What books should I read if I want to learn javascript"))
+    ai("cooking books")
+    print(cleanup())
     #main()
