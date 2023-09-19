@@ -44,7 +44,7 @@ def cleanup():
     titles = []
     for line in lines:
         line = line.rstrip()
-        if matches := re.search(r"Title: \"(.+)\"$", line, re.IGNORECASE):
+        if matches := re.search(r"Title: (.+)$", line, re.IGNORECASE):
             title = matches.group(1)
             titledict = {}
             titledict = title
