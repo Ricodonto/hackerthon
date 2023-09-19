@@ -9,7 +9,8 @@
                 <th>Author</th>
                 <th>ISBN</th>
                 <th>Ratings</th>
-                <th>Description</th>              
+                <th>Description</th>   
+                <th>Book Image</th>           
                 
             </tr>
         </thead>
@@ -21,7 +22,8 @@
                     <td>{{ details['isbn'][i] }}</td>
                     <td>{{ details['ratings'][i] }}</td>
                     <td>{{ details['description'][i] }}</td>
-                    <td><img src=&#123;&#123; details['images'][i] &#125;&#125; alt=""></td>
+                    <td><img src="{{ details['images'][i] }}" alt=""></td>
+
                     
                     <!-- <td>{{ i }}</td>
                     <td>{{ i }}</td>

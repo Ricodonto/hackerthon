@@ -98,7 +98,7 @@ def cleanup():
 
     images = []
     for isbn in isbns:
-        imageurl = f"https://covers.openlibrary.org/b/isbn/{isbn}.jpg"
+        imageurl = f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg"
         images.append(imageurl)
 
     details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":descriptions, "images":images}
