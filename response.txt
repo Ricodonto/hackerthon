@@ -1,0 +1,29 @@
+1. Title: "The Joy of Cooking"
+   ISBN: 9780743246262
+   Description: A comprehensive guide to cooking techniques, recipes, and kitchen tips.
+   Author: Irma S. Rombauer, Marion Rombauer Becker, Ethan Becker
+   Ratings: 4.5/5
+
+2. Title: "Salt, Fat, Acid, Heat: Mastering the Elements of Good Cooking"
+   ISBN: 9781476753836
+   Description: A revolutionary approach to cooking that focuses on the four essential elements.
+   Author: Samin Nosrat
+   Ratings: 4.7/5
+
+3. Title: "The Pioneer Woman Cooks: Recipes from an Accidental Country Girl"
+   ISBN: 9780061658198
+   Description: A collection of delicious and comforting recipes from the popular food blogger.
+   Author: Ree Drummond
+   Ratings: 4.6/5
+
+4. Title: "Cooking for Jeffrey: A Barefoot Contessa Cookbook"
+   ISBN: 9780307464897
+   Description: Ina Garten shares her favorite recipes and stories from her marriage to Jeffrey.
+   Author: Ina Garten
+   Ratings: 4.8/5
+
+5. Title: "The Complete Mediterranean Cookbook: 500 Vibrant, Kitchen-Tested Recipes for Living and Eating Well Every Day"
+   ISBN: 9781940352640
+   Description: A collection of Mediterranean-inspired recipes for a healthy and flavorful lifestyle.
+   Author: America's Test Kitchen
+   Ratings: 4.4/5

@@ -14,9 +14,8 @@ def landing():
     if form.is_submitted():
         result = request.form
         response = {}
-        usrprompt = str(result["prompt"])
-        forwd_prompt = usrprompt + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK"
-        response["prompt"] = usrprompt
+        forwd_prompt = str(result["prompt"])
+        response["prompt"] = forwd_prompt
         response = ai(forwd_prompt)
         array_response = cleanup()
 
@@ -24,6 +23,7 @@ def landing():
             os.remove("response.txt")
 
         # return array_response
+        return array_response
         return render_template("book_table.html", details=array_response)
 
     return render_template("landing_page.html", form=form)
