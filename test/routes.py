@@ -14,6 +14,9 @@ def landing():
     if form.is_submitted():
         result = request.form
         response = {}
+        if result["prompt"] == "":
+            return render_template("landing_page.html", form=form, errormsg="Fill in the prompt")
+        
         forwd_prompt = str(result["prompt"])
         response["prompt"] = forwd_prompt
         response = ai(forwd_prompt)
