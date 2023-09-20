@@ -4,15 +4,6 @@ load_dotenv('.env')
 
 import openai
 
-# def main():
-#     user_input = input("Enter prompt, e.g What book should I read to learn javascript ")
-#     user_input = user_input + ", and MAKE SURE TO TELL ME THE ISBN CODES, DESCRIPTIONS AND AVERAGE RATINGS OF EACH BOOK and don't recommend series"
-#     ai(user_input)
-#     details = cleanup()
-#     print(details)
-
-
-
 def ai(prompt):
     check = True
     while check == True:
@@ -27,23 +18,32 @@ def ai(prompt):
                 
                 # Change if giving it starts not giving isbn
                 temperature = 0.0,
+                # Telling Chat GPT to give its results in this manner
+                # Title: ...
+                # ISBN: ...
+                # Description: ...
+                # Author: ...
+                # Ratings: ...
                 messages=[{"role":"system", "content":"do not contain a series of books"},
                     {"role":"system", "content":"only contain the title, isbn, descrition, author and ratings for each book and use colons"},
                     {"role": "user", "content": prompt}])
             message.append(completion.choices[0].message.content)
     
-    
+    # Generating a file that contains gpts formatted results labelled response.txt
     file = open("response.txt", "w")
     file.write(message[0])
     file.close()
 
 def cleanup():
+    # Opening the generated file
     with open("response.txt", "r") as file:
+        # Creatings a list containing each line of the response.txt file
         lines = file.readlines()
         print("Response Loaded")
     titles = []
     for line in lines:
         line = line.rstrip()
+        # Filtering and storing the required  title, isbn and etc information
         if matches := re.search(r"Title: (.+)$", line, re.IGNORECASE):
             title = matches.group(1)
             titledict = {}
@@ -101,12 +101,14 @@ def cleanup():
         imageurl = f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg"
         images.append(imageurl)
 
+    # Returning an array containing the lists of required data
     details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":descriptions, "images":images}
     return details
 
 
 
 if __name__ == '__main__':
+    # For testing purposes
     ai("cooking books")
     print(cleanup())
     #main()
