@@ -1,0 +1,47 @@
+{% extends "base_template.html" %}
+{% block content %}
+
+<h1>Recommendation History</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>ISBN</th>
+            <th>Description</th>
+            <th>Rating</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in history %}
+            <tr>
+                <td>
+                    {% for title in item.title %}
+                        {{ title }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for author in item.author %}
+                        {{ author }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for isbn in item.isbn %}
+                        {{ isbn }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for description in item.description %}
+                        {{ description }}<br>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for rating in item.rating %}
+                        {{ rating }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

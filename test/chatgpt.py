@@ -1,8 +1,12 @@
-import os, re
+import os
+import re
 from dotenv import load_dotenv
 load_dotenv('.env')
 
 import openai
+import json
+from datetime import datetime
+import atexit
 
 def ai(prompt):
     check = True
@@ -14,22 +18,17 @@ def ai(prompt):
 
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                # Figure out whether you wanna give the assistant a role
-                
-                # Change if giving it starts not giving isbn
-                temperature = 0.0,
-                # Telling Chat GPT to give its results in this manner
-                # Title: ...
-                # ISBN: ...
-                # Description: ...
-                # Author: ...
-                # Ratings: ...
-                messages=[{"role":"system", "content":"do not contain a series of books"},
-                    {"role":"system", "content":"only contain the title, isbn, descrition, author and ratings for each book and use colons"},
-                    {"role": "user", "content": prompt}])
+                temperature=0.0,
+                messages=[
+                    {"role":"system", "content":"do not contain a series of books"},
+                    {"role":"system", "content":"only contain the title, isbn, description, author, and ratings for each book and use colons"},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            
             message.append(completion.choices[0].message.content)
     
-    # Generating a file that contains gpts formatted results labelled response.txt
+    # Generating a file that contains GPT-3.5 Turbo's formatted results labeled response.txt
     file = open("response.txt", "w")
     file.write(message[0])
     file.close()
@@ -37,78 +36,91 @@ def ai(prompt):
 def cleanup():
     # Opening the generated file
     with open("response.txt", "r") as file:
-        # Creatings a list containing each line of the response.txt file
+        # Creating a list containing each line of the response.txt file
         lines = file.readlines()
         print("Response Loaded")
     titles = []
-    for line in lines:
-        line = line.rstrip()
-        # Filtering and storing the required  title, isbn and etc information
-        if matches := re.search(r"Title: (.+)$", line, re.IGNORECASE):
-            title = matches.group(1)
-            titledict = {}
-            titledict = title
-            titles.append(titledict)
-
-    # Sample output is [{'title': 'Eloquent JavaScript: A Modern Introduction to Programming'}, {'title': 'JavaScript: The Good Parts'}, {'title': "You Don't Know JS"}, {'title': 'JavaScript: The Definitive Guide'}, {'title': 'Head First JavaScript Programming'}]
-
     authors = []
-    for line in lines:
-        line = line.rstrip()
-
-        if matches := re.search(r"Author: (.+)$", line, re.IGNORECASE):
-            author = matches.group(1)
-            authors.append(author)
-
-
     isbns = []
+    ratings = []
+    descriptions = []
+    images = []
+    current_recommendation = {}
+
     for line in lines:
         line = line.rstrip()
-
-        if matches := re.search(r"ISBN: ([0-9\-]+)$", line, re.IGNORECASE):
+        if matches := re.search(r"Title: (.+)$", line, re.IGNORECASE):
+            current_recommendation["title"] = matches.group(1)
+        elif matches := re.search(r"Author: (.+)$", line, re.IGNORECASE):
+            current_recommendation["author"] = matches.group(1)
+        elif matches := re.search(r"ISBN: ([0-9\-]+)$", line, re.IGNORECASE):
             isbn = matches.group(1)
             isbn = isbn.replace("-", "")
-            isbns.append(isbn)
-
-    if len(isbns) == 0:
-        for line in lines:
-            line = line.rstrip()
-
-            if matches := re.search(r"ISBN(-)?(13)?: (.+)$", line, re.IGNORECASE):
-                isbn = matches.group(1)
-                isbns.append(isbn)
-
-
-    ratings = []
-    for line in lines:
-        line = line.rstrip()
-
-        if matches := re.search(r"Ratings: ([0-9./]+)$", line, re.IGNORECASE):
-            rating = matches.group(1)
-            ratings.append(rating)
-
-
-    descriptions = []
-    for line in lines:
-        line = line.rstrip()
-
-        if matches := re.search(r"Description: (.+)$", line, re.IGNORECASE):
-            description = matches.group(1)
-            descriptions.append(description)
-
-    images = []
-    for isbn in isbns:
-        imageurl = f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg"
-        images.append(imageurl)
+            current_recommendation["isbn"] = isbn
+        elif matches := re.search(r"Ratings: ([0-9./]+)$", line, re.IGNORECASE):
+            current_recommendation["ratings"] = matches.group(1)
+        elif matches := re.search(r"Description: (.+)$", line, re.IGNORECASE):
+            current_recommendation["description"] = matches.group(1)
+        elif line.strip() == "":
+            # An empty line indicates the end of a recommendation
+            titles.append(current_recommendation.get("title", ""))
+            authors.append(current_recommendation.get("author", ""))
+            isbns.append(current_recommendation.get("isbn", ""))
+            ratings.append(current_recommendation.get("ratings", ""))
+            descriptions.append(current_recommendation.get("description", ""))
+            images.append(f"https://covers.openlibrary.org/b/isbn/{current_recommendation.get('isbn', '')}-M.jpg")
+            current_recommendation = {}
 
     # Returning an array containing the lists of required data
-    details = {"title":titles, "author":authors, "isbn":isbns, "ratings":ratings, "description":descriptions, "images":images}
+    details = {
+        "title": titles,
+        "author": authors,
+        "isbn": isbns,
+        "ratings": ratings,
+        "description": descriptions,
+        "images": images
+    }
+    record_recommendation(details)
     return details
 
+def record_recommendation(details):
+    history = []
 
+    # Load existing history from the JSON file, if any
+    try:
+        with open("recommendation_history.json", "r") as file:
+            history = json.load(file)
+    except FileNotFoundError:
+        pass
+
+    # Append the new recommendation to the history
+    history.append(details)
+
+    # Write the updated history back to the JSON file
+    with open("recommendation_history.json", "w") as file:
+        # Serialize the data to JSON (convert non-serializable lists to regular lists)
+        serialized_history = []
+        for recommendation in history:
+            serialized_recommendation = {
+                "title": recommendation["title"],
+                "author": recommendation["author"],
+                "isbn": recommendation["isbn"],
+                "ratings": recommendation["ratings"],
+                "description": recommendation["description"],
+                "images": recommendation["images"]
+            }
+            serialized_history.append(serialized_recommendation)
+        json.dump(serialized_history, file, indent=4)
+
+
+def clear_history_file():
+    with open("recommendation_history.json", "w") as file:
+        json.dump([], file)
+
+# Register the cleanup function to run on exit
+atexit.register(clear_history_file)
 
 if __name__ == '__main__':
     # For testing purposes
     ai("cooking books")
     print(cleanup())
-    #main()

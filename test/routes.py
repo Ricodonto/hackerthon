@@ -1,6 +1,8 @@
+import json
 from flask import Blueprint, render_template, request
 from forms import PromptForm
 from chatgpt import ai, cleanup
+from flask import jsonify
 
 
 import os
@@ -37,7 +39,16 @@ def landing():
 def about():
     return render_template("about.html")
 
+from flask import render_template
+
 @routes.route("/history")
 def history():
-    # Placeholder for the history page
-    return render_template("history.html")
+    # Read the recommendation history from the JSON file
+    try:
+        with open("recommendation_history.json", "r") as file:
+            history = json.load(file)
+    except FileNotFoundError:
+        history = []
+
+    # Render the HTML template and pass the history data to it
+    return render_template("history.html", history=history)
