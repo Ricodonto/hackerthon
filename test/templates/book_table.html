@@ -1,6 +1,9 @@
 {%extends "base_template.html"%}
 {%block content%}
     <h1>Book Recommendations and Details</h1>
+    {%if details["title"]|length == 0%}
+    <h2>Suitable Books not Found</h2>
+    {%else%}
     <table border="1">
         <thead>
             <tr>
@@ -31,4 +34,5 @@
             {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 {%endblock%}
