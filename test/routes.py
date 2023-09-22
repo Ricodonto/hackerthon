@@ -1,8 +1,9 @@
 import json
 from flask import Blueprint, render_template, request
 from forms import PromptForm
-from chatgpt import ai, cleanup
+from chatgpt import ai, cleanup, clear_history_file
 from flask import jsonify
+
 
 
 import os
@@ -52,3 +53,10 @@ def history():
 
     # Render the HTML template and pass the history data to it
     return render_template("history.html", history=history)
+    
+    
+@routes.route("/delhistory")
+def delhistory():
+    with open("recommendation_history.json", "w") as file:
+        deleted = json.dump([], file)
+    return render_template("delhistory.html",deleted=deleted)
