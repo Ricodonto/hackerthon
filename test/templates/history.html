@@ -1,7 +1,12 @@
 {% extends "base_template.html" %}
 {% block content %}
+
 <h1>Recommendation History</h1>
+
 <h3 style="font-size:20px; display: inline;"><a href="http://127.0.0.1:5000/delhistory">Delete Your History</a></h3>
+<br><br>
+
+{%if history|length>0 %}
 <table border="1">
     <thead>
         <tr>
@@ -13,6 +18,7 @@
         </tr>
     </thead>
     <tbody>
+       
         {% for item in history %}
             <tr>
                 <td>
@@ -44,4 +50,7 @@
         {% endfor %}
     </tbody>
 </table>
+{%else%}
+<h2>Empty</h2>
+{%endif%}
 {% endblock %}
