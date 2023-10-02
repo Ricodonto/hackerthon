@@ -6,7 +6,7 @@
 <h3 style="font-size:20px; display: inline;"><a href="http://127.0.0.1:5000/delhistory">Delete Your History</a></h3>
 <br><br>
 
-{%if history|length>0 %}
+{% if history|length > 0 %}
 <table border="1">
     <thead>
         <tr>
@@ -19,44 +19,33 @@
         </tr>
     </thead>
     <tbody>
-       
         {% for item in history %}
-            <tr>
-                <td>
-                    {% for images in item.images %}
-                    <img src="{{ images }}" alt = "Book Image"<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for title in item.title %}
-                        {{ title }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for author in item.author %}
-                        {{ author }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for isbn in item.isbn %}
-                        {{ isbn }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for description in item.description %}
-                        {{ description }}<br>
-                    {% endfor %}
-                </td>
-                <td>
-                    {% for ratings in item.rating %}
-                        {{ ratings }}<br>
-                    {% endfor %}
-                </td>
-            </tr>
+            {% for i in range(item.title|length) %}
+                <tr>
+                    <td>
+                        <img src="{{ item.images[i] }}" alt="Book Image"><br>
+                    </td>
+                    <td>
+                        {{ item.title[i] }}<br>
+                    </td>
+                    <td>
+                        {{ item.author[i] }}<br>
+                    </td>
+                    <td>
+                        {{ item.isbn[i] }}<br>
+                    </td>
+                    <td>
+                        {{ item.description[i] }}<br>
+                    </td>
+                    <td>
+                        {{ item.ratings[i] }}<br>
+                    </td>
+                </tr>
+            {% endfor %}
         {% endfor %}
     </tbody>
 </table>
-{%else%}
+{% else %}
 <h2>Empty</h2>
-{%endif%}
+{% endif %}
 {% endblock %}
