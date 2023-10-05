@@ -1,4 +1,4 @@
-name: Learn Git Hub Actions # This is optional but it's used as the name that is shown on the actions tab
+name: Learn Git Hub Actions # This is optional but it's used as the name that is shown on the actions tab, otherwise it shows the name of the file
 
 run-name: ${{ github.actor }} is learning Github Actions # The name of the workflow runs generated from workflow
 
