@@ -3,6 +3,14 @@
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta name="description"
+                content="Where to find books easily" />
+            <meta name="keywords"
+                content="where, find books" />
+            <meta http-equiv="author"
+                content="Patrick Njoroge, Nathan Githinji, Christopher Chege, Roman Njoroge" />
+            <meta http-equiv="pragma"
+                content="no cache" />
             <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
             <title>BookFinder</title>
         </head>
@@ -11,10 +19,11 @@
                 <h1>BookFinder</h1>
             </header>
             <div id="navbar"> 
+                <div class="nav-link">
                 <h3 style="font-size:20px; display: inline;"><a href="http://127.0.0.1:5000/">Home</a></h3>&nbsp;&nbsp;&nbsp;&nbsp;
                 <h3 style="font-size:20px; display: inline;"><a href="http://127.0.0.1:5000/about">About</a></h3>&nbsp;&nbsp;&nbsp;&nbsp;
                 <h3 style="font-size:20px; display: inline;"><a href="http://127.0.0.1:5000/history">History</a></h3>&nbsp;&nbsp;&nbsp;&nbsp;
-                
+                </div>
             </div>           
             <main>
                 <!-- Template inheritance -->

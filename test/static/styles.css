@@ -33,3 +33,12 @@ footer {
     width: 100%;
     bottom: 0;
 }
+.nav-link a {
+    font-size: 16px;
+    color: blue;
+    text-decoration: none;
+  }
+  
+  .nav-link a:hover {
+    text-decoration: underline;
+  }
