@@ -25,6 +25,7 @@ def landing():
         response["prompt"] = forwd_prompt
         response = ai(forwd_prompt)
         array_response = cleanup()
+        array_response["prompt"] = result["prompt"]
 
         # Deleting the response text file that was generated
         if os.path.isfile("response.txt"):
