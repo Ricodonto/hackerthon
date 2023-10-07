@@ -1,0 +1,69 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: "Elephant", sans-serif;
+}
+
+main {
+    height: 500px;
+    width: 500px;
+}
+
+.inline-link {
+    display: inline;
+    text-decoration: none;
+    color: red;
+}
+
+.redirect-to-login {
+    font-size: 16px;
+    display: inline-block;
+    margin: 46px auto;
+}
+
+.login-heading {
+    margin-bottom: 50px;
+    font-size: 27px;
+    text-align: center;
+    font-weight: normal;
+}
+
+.email, .password {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    font-size: 14px;
+    display: block;
+    margin-bottom: 7px;
+}
+
+.form-input {
+    display: block;
+    border: 1px solid black;
+    border-radius: 13px;
+    width: 317px;
+    height: 47px;
+    padding-left: 15px;
+}
+
+.login-form {
+    border: 1px solid black;
+    border-radius: 13px;
+    padding: 70px 85px;
+}
+
+.login-button {
+    width: 332px;
+    height: 47px;
+    border: 1px solid black;
+    border-radius: 13px;
+    margin-top: 23px;
+    background-color: rgb(217, 217, 217);
+}
+
+main {
+    
+}
