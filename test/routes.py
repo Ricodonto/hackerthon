@@ -1,14 +1,15 @@
 import datetime
 import json
-from flask import Blueprint, render_template, request, redirect
+from flask import Blueprint, redirect, render_template, request, url_for
 from forms import PromptForm
-from chatgpt import ai, cleanup, clear_history_file
+from forms import DeleteForm
+from chatgpt import ai, cleanup
 from flask import jsonify
+
 import os
 from supabase_py import create_client, Client
 import bcrypt
 import jwt
-
 
 import os
 from pathlib import Path
@@ -29,6 +30,7 @@ def landing():
         response["prompt"] = forwd_prompt
         response = ai(forwd_prompt)
         array_response = cleanup()
+        array_response["prompt"] = result["prompt"]
 
         # Deleting the response text file that was generated
         if os.path.isfile("response.txt"):
@@ -143,9 +145,7 @@ def login():
 def about():
     return render_template("about.html")
 
-from flask import render_template
-
-@routes.route("/history")
+@routes.route("/history", methods=['GET', 'POST'])
 def history():
     # Read the recommendation history from the JSON file
     try:
@@ -154,12 +154,11 @@ def history():
     except FileNotFoundError:
         history = []
 
+    form = DeleteForm()
+    if form.is_submitted() and form.validate_on_submit():
+        with open("recommendation_history.json", "w") as file:
+            json.dump([], file)  # Just write the empty list, no need to assign the result to a variable
+        return redirect(url_for("routes.history"))
+
     # Render the HTML template and pass the history data to it
-    return render_template("history.html", history=history)
-    
-    
-@routes.route("/delhistory")
-def delhistory():
-    with open("recommendation_history.json", "w") as file:
-        deleted = json.dump([], file)
-    return render_template("delhistory.html",deleted=deleted)
+    return render_template("history.html", history=history, form=form)

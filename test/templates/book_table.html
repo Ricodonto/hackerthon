@@ -4,6 +4,7 @@
     {%if details["title"]|length == 0%}
     <h2>Suitable Books not Found</h2>
     {%else%}
+    <h2>Prompt: {{ details['prompt'] }}</h2>
     <table border="1">
         <thead>
             <tr>
