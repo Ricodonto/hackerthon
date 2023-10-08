@@ -1,10 +1,9 @@
 import json
-from flask import Blueprint, render_template, request
+from flask import Blueprint, redirect, render_template, request, url_for
 from forms import PromptForm
+from forms import DeleteForm
 from chatgpt import ai, cleanup, clear_history_file
 from flask import jsonify
-
-
 
 import os
 from pathlib import Path
@@ -41,9 +40,7 @@ def landing():
 def about():
     return render_template("about.html")
 
-from flask import render_template
-
-@routes.route("/history")
+@routes.route("/history", methods=['GET', 'POST'])
 def history():
     # Read the recommendation history from the JSON file
     try:
@@ -52,12 +49,11 @@ def history():
     except FileNotFoundError:
         history = []
 
+    form = DeleteForm()
+    if form.is_submitted() and form.validate_on_submit():
+        with open("recommendation_history.json", "w") as file:
+            json.dump([], file)  # Just write the empty list, no need to assign the result to a variable
+        return redirect(url_for("routes.history"))
+
     # Render the HTML template and pass the history data to it
-    return render_template("history.html", history=history)
-    
-    
-@routes.route("/delhistory")
-def delhistory():
-    with open("recommendation_history.json", "w") as file:
-        deleted = json.dump([], file)
-    return render_template("delhistory.html",deleted=deleted)
+    return render_template("history.html", history=history, form=form)
