@@ -34,19 +34,33 @@ main {
     margin-bottom: 16px;
 }
 
-.form-label {
+.form-label, .form-label-error {
     font-size: 14px;
     display: block;
     margin-bottom: 7px;
 }
 
-.form-input {
+.form-label-error {
+    color: red;
+}
+
+.error-message {
+    color: red;
+    margin-top: 16px;
+}
+
+
+.form-input, .form-input-error {
     display: block;
     border: 1px solid black;
     border-radius: 13px;
     width: 317px;
     height: 47px;
     padding-left: 15px;
+}
+
+.form-input-error {
+    border: 1px solid red;
 }
 
 .login-form {
