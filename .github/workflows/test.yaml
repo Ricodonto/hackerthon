@@ -1,0 +1,19 @@
+name: Learn Git Hub Actions # This is optional but it's used as the name that is shown on the actions tab, otherwise it shows the name of the file
+
+run-name: ${{ github.actor }} is learning Github Actions # The name of the workflow runs generated from workflow
+
+on: [push] # This specifies what event triggers the event
+
+jobs: # This groups together the jobs that are run
+  check-bats-version: # Define check-bats-job
+    runs-on: ubuntu-latest # Defines job to run on the latest ubuntu runner
+    steps: # Groups together all the steps in the job
+      - uses: actions/checkout@v4 # The use command specifies the action to be run
+
+      - uses: actions/setup-node@v3
+        with: 
+          node-version: '14'
+
+      - run: npm install -g bats # The run command specifies the command to be run on the runner
+
+      - run: bats -v
