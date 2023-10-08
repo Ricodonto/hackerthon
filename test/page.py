@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-from flask import Flask, render_template
+from flask import Flask
 from routes import routes
 
 

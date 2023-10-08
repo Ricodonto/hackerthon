@@ -23,9 +23,9 @@
         <h1>BookFinder</h1>
         <nav>
             <ul>
-            <li><a href="http://127.0.0.1:5000/">Home</a></li>
-            <li><a href="http://127.0.0.1:5000/about">About</a></li>
-            <li><a href="http://127.0.0.1:5000/history">History</a></li>
+                <li><a href="{{ url_for('routes.landing') }}">Home</a></li>
+                <li><a href="{{ url_for('routes.about') }}">About</a></li>
+                <li><a href="{{ url_for('routes.history') }}">History</a></li>
             </ul>
         </nav>
     </header>          
@@ -38,9 +38,9 @@
     <footer>
         <nav class="nothing">
             <ul>
-            <li><a href="http://127.0.0.1:5000/">Home</a></li>
-            <li><a href="http://127.0.0.1:5000/about">About</a></li>
-            <li><a href="http://127.0.0.1:5000/history">History</a></li>
+            <li><a href="{{ url_for('routes.landing') }}">Home</a></li>
+            <li><a href="{{ url_for('routes.about') }}">About</a></li>
+            <li><a href="{{ url_for('routes.history') }}">History</a></li>
             </ul>
         </nav>
         &copy; 2023 BookFinder.
