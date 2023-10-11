@@ -9,7 +9,7 @@
 <body>
     <main>
         <h2 class="login-heading">Register to your Bookfinder account</h2>
-        <form class="login-form" action="{{ url_for('routes.login')}}" method="post">
+        <form class="login-form" action="{{ url_for('routes.signup')}}" method="post">
             {% if error == True%}
             <div class="email">
                 <label for="email-text-input" class="form-label-error">Email Address</label>
@@ -28,7 +28,7 @@
             {% if error == True %}
             <p class="error-message">{{ error_message }}</p>
             {% endif %}
-            <input class="login-button" class="login-button" type="submit" value="Login">
+            <input class="login-button" class="login-button" type="submit" value="Register">
         </form>
         <div style="text-align: center;">
             <div class="redirect-to-login">
