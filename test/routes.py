@@ -18,7 +18,7 @@ routes = Blueprint(__name__,"route")
 
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
-    if "user" not in session:
+    if "username" not in session:
         return redirect('/login')
 
     form = PromptForm()
@@ -49,11 +49,14 @@ def landing():
 def signup():
     error = False
     error_message = ""
+    print(1)
 
     if request.method == "GET":
+        print(2)
         return render_template("signup.html", error=error, error_message=error_message)
     else:
         # Get username and password
+        print(3)
         username: str = request.form['username']
         password: str = request.form['password']
 
@@ -61,6 +64,7 @@ def signup():
 
         # Make sure none of the details are empty
         if len(username) == 0 or len(password) == 0:
+            print(4)
             error = True
             error_message = "Invalid Credentials"
             return render_template("signup.html", error=error, error_message=error_message)
@@ -68,80 +72,95 @@ def signup():
         # Check if user already exists
         
         # Create connection to supabase
+        print(5)
         url = os.environ.get("SUPABASE_URL")
         key = os.environ.get("SUPABASE_KEY")
-        supabase = create_client(url, key)
+        print(url)
+        print(key)  
+        client = create_client(supabase_url=url, supabase_key=key)
 
-        user_exist_response = supabase.table('Users').select('username').eq('username', username).execute()
+        print(6)
+        user_exist_response = client.table('Users').select('username').eq('username', username).execute()
 
         # If user exists return error
+        print(7)
         if len(user_exist_response['data']) > 0:
+            print(8)
             error = True
             error_message = "User Already Exists"
             return render_template("signup.html", error=error, error_message=error_message)
 
         # Hash password
+        print(9)
         password_bytes = bytes(password, 'utf-8')
         salt = bcrypt.gensalt(rounds=15)
         hashed_password_bytes = bcrypt.hashpw(password_bytes, salt=salt)
         hashed_password = hashed_password_bytes.decode()
 
         # Store in database
-        data = supabase.table('Users').insert({"username": username, "hashed_password": hashed_password}).execute()
+        print(10)
+        data, error = client.table("Users").insert({"username": username, "hashed_password": hashed_password}).execute()
+        print(data, error)
+        print(11)
+        session['username'] = username
 
-        # Send JWT
-        # Generate the token
-        token = jwt.encode({
-            'username': username,
-            'exp' : datetime.utcnow() + datetime.timedelta(minutes = 30)
-        })
-
-        return jsonify({"token": token})
+        return redirect('/')
 
 # Route for login
 @routes.route("/login", methods=['GET', 'POST'])
 def login():
     error = False
     error_message = ""
+    print(1)
 
     # If it is a get request to this route display the login page
     if request.method == "GET":
+        print(2)
         return render_template('login.html')
     else:
+        print(3)
         # Get user details
         username = request.form['username']
         password = request.form['password']
 
         # Store information in session 
         session['username'] = username
-        session['password'] = password
-
         # Fetch user with username
         # Create connection to supabase
+        print(4)
         url = os.environ.get("SUPABASE_URL")
         key = os.environ.get("SUPABASE_KEY")
-        supabase = create_client(url, key)
+        print(5)
+        client = create_client(supabase_url=url, supabase_key=key)
 
         # select password of user with username
-        response = supabase.table('Users').select('hashed_password').eq('username', username).execute()
+        print(6)
+        response = client.table('Users').select('hashed_password').eq('username', username).execute()
+        print(response)
         
         # Return an error if nothing was found
         if (len(response['data']) <= 0):
+            print(7)
             # Set error to true
             error = True
             error_message = "Invalid Credentials"
             return render_template("login.html", error=error, error_message=error_message)
 
         # Compare hashed passwords
-        hashed_password = response.data[0]['hashed_password']
-        is_same = bcrypt.checkpw(password=password, hashed_password=hashed_password)
+        print(8)
+        hashed_password = response['data'][0]['hashed_password']
+        hashed_password_bytes = hashed_password.encode()
+        is_same = bcrypt.checkpw(password=password.encode(), hashed_password=hashed_password_bytes)
 
         if is_same == True:
+            print(9)
             # Create Sesssion
+            session['username'] = username
 
             # Redirect to home page
             return redirect("/")
         else:
+            print(10)
             error = True
             error_message = "Invalid Credentials"
             # Show error screen
@@ -149,13 +168,13 @@ def login():
 
 @routes.route("/about")
 def about():
-    if "user" not in session:
+    if "username" not in session:
         return redirect('/login')
     return render_template("about.html")
 
 @routes.route("/history", methods=['GET', 'POST'])
 def history():
-    if "user" not in session:
+    if "username" not in session:
         return redirect('/login')
     # Read the recommendation history from the JSON file
     try:
