@@ -1,7 +1,9 @@
 import os
 import re
 from dotenv import load_dotenv
+from flask import request
 load_dotenv('.env')
+from forms import PromptForm
 
 import openai
 import json
@@ -92,9 +94,19 @@ def record_recommendation(details):
             history = json.load(file)
     except FileNotFoundError:
         pass
+    
+    form = PromptForm()
+    if form.is_submitted():
+        result = request.form
+        user_prompt = result["prompt"]
+    
+    recommendation_entry = {
+        "user_prompt": user_prompt,
+        "recommendation": details}
+
 
     # Append the new recommendation to the history
-    history.append(details)
+    history.append(recommendation_entry)
 
     # Write the updated history back to the JSON file
     with open("recommendation_history.json", "w") as file:
@@ -102,16 +114,18 @@ def record_recommendation(details):
         serialized_history = []
         for recommendation in history:
             serialized_recommendation = {
-                "title": recommendation["title"],
-                "author": recommendation["author"],
-                "isbn": recommendation["isbn"],
-                "ratings": recommendation["ratings"],
-                "description": recommendation["description"],
-                "images": recommendation["images"]
+                "user_prompt": recommendation["user_prompt"],
+                "recommendation": {
+                    "title": recommendation["recommendation"]["title"],
+                    "author": recommendation["recommendation"]["author"],
+                    "isbn": recommendation["recommendation"]["isbn"],
+                    "ratings": recommendation["recommendation"]["ratings"],
+                    "description": recommendation["recommendation"]["description"],
+                    "images": recommendation["recommendation"]["images"]
+                }
             }
             serialized_history.append(serialized_recommendation)
         json.dump(serialized_history, file, indent=4)
-
 
 def clear_history_file():
     with open("recommendation_history.json", "w") as file:
