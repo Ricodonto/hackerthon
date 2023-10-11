@@ -1,6 +1,6 @@
 import datetime
 import json
-from flask import Blueprint, redirect, render_template, request, url_for
+from flask import Blueprint, redirect, render_template, request, url_for, session
 from forms import PromptForm
 from forms import DeleteForm
 from chatgpt import ai, cleanup
@@ -18,6 +18,9 @@ routes = Blueprint(__name__,"route")
 
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
+    if "user" not in session:
+        return redirect('/login')
+
     form = PromptForm()
     if form.is_submitted():
         result = request.form
@@ -109,6 +112,10 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
+        # Store information in session 
+        session['username'] = username
+        session['password'] = password
+
         # Fetch user with username
         # Create connection to supabase
         url = os.environ.get("SUPABASE_URL")
@@ -123,30 +130,33 @@ def login():
             # Set error to true
             error = True
             error_message = "Invalid Credentials"
-            print(error_message)
-            return render_template("login.html") # TO DO Add error variables etc
+            return render_template("login.html", error=error, error_message=error_message)
 
-        # # Compare hashed passwords
-        # hashed_password = response.data[0]['hashed_password']
-        # is_same = bcrypt.checkpw(password=password, hashed_password=hashed_password)
+        # Compare hashed passwords
+        hashed_password = response.data[0]['hashed_password']
+        is_same = bcrypt.checkpw(password=password, hashed_password=hashed_password)
 
-        # if is_same == true:
-        #     # Send JWT 
+        if is_same == True:
+            # Create Sesssion
 
-        #     # Redirect to home page
-        #     return redirect("/")
-        # else:
-        #     error = true
-        #     # Show error screen
-        #     return render_template()
-        return redirect("/login")
+            # Redirect to home page
+            return redirect("/")
+        else:
+            error = True
+            error_message = "Invalid Credentials"
+            # Show error screen
+            return render_template("login.html", error=error, error_message=error_message)
 
 @routes.route("/about")
 def about():
+    if "user" not in session:
+        return redirect('/login')
     return render_template("about.html")
 
 @routes.route("/history", methods=['GET', 'POST'])
 def history():
+    if "user" not in session:
+        return redirect('/login')
     # Read the recommendation history from the JSON file
     try:
         with open("recommendation_history.json", "r") as file:
