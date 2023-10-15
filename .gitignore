@@ -2,3 +2,4 @@
 .env
 env
 setUpDatabase.ipynb
+recommendation_history.json
