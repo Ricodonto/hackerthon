@@ -47,6 +47,7 @@ def cleanup():
     ratings = []
     descriptions = []
     images = []
+    urls = []
     current_recommendation = {}
 
     for line in lines:
@@ -71,6 +72,7 @@ def cleanup():
             ratings.append(current_recommendation.get("ratings", ""))
             descriptions.append(current_recommendation.get("description", ""))
             images.append(f"https://covers.openlibrary.org/b/isbn/{current_recommendation.get('isbn', '')}-M.jpg")
+            urls.append(f"https://openlibrary.org/isbn/{current_recommendation.get('isbn', '')}")
             current_recommendation = {}
 
     # Returning an array containing the lists of required data
@@ -80,7 +82,8 @@ def cleanup():
         "isbn": isbns,
         "ratings": ratings,
         "description": descriptions,
-        "images": images
+        "images": images,
+        "urls": urls
     }
     record_recommendation(details)
     return details
@@ -121,7 +124,8 @@ def record_recommendation(details):
                     "isbn": recommendation["recommendation"]["isbn"],
                     "ratings": recommendation["recommendation"]["ratings"],
                     "description": recommendation["recommendation"]["description"],
-                    "images": recommendation["recommendation"]["images"]
+                    "images": recommendation["recommendation"]["images"],
+                    "urls": recommendation["recommendation"]["urls"]
                 }
             }
             serialized_history.append(serialized_recommendation)

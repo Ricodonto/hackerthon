@@ -27,6 +27,7 @@
                         <th>ISBN</th>
                         <th>Description</th>
                         <th>Rating</th>
+                        <th>More info</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +50,9 @@
                             </td>
                             <td>
                                 {{ item.recommendation.ratings[i] }}<br>
+                            </td>
+                            <td>
+                                <a href="{{ item.recommendation.urls[i] }}">More Info</a>
                             </td>
                         </tr>
                     {% endfor %}
