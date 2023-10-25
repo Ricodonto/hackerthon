@@ -1,0 +1,36 @@
+.navbar {
+    padding: 10px;
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-title {
+    color: white;
+}
+
+.links {
+    list-style-type: none;
+}
+
+.individual-link {
+    display: inline-block;
+    padding-right: 30px;
+}
+
+footer {
+    background-color: #333;
+    color: #fff;
+    padding:20px;
+    text-align: center;
+    position:fixed; /* Change to fixed */
+    width: 100%;
+    bottom: 0;
+}
+
+.content {
+    padding: 30px;
+    background-color: grey;
+    min-height: 70vh;
+}
