@@ -92,7 +92,12 @@ function SearchResult(props) {
     );
 }
 
-function MyButton(props) {
+export function MyButton(props) {
+    if(props.delete === true) {
+        return (
+            <button className='linkbox-delete' onClick={props.handleClick}>{props.text}</button>
+        );
+    }
     return (
         <button className='linkbox' onClick={props.handleClick}>{props.text}</button>
     );

@@ -51,7 +51,11 @@ h2 {
     margin-bottom: 10px;
 }
 
-.linkbox {
+.linkbox-delete {
+    color: red;
+}
+
+.linkbox, .linkbox-delete {
     display: inline-block;
     padding: 0px 10px;
     min-width: 86px;
