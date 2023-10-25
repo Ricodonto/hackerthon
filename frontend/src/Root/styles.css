@@ -8,9 +8,9 @@
 .page-title {
     font-size: 40px;
     font-family: 'Inter', sans-serif;
-    position: fixed;
+    position: relative;
     top: 0px;
-    left: 45vw;
+    left: 32vw;
 }
 
 .user-initial {
@@ -72,8 +72,8 @@
 
 footer {
     background-color: #D9D9D9;
-    padding:20px;
-    position:fixed; /* Change to fixed */
+    padding: 20px;
+    position: relative; /* Change to fixed */
     width: 100%;
     bottom: 0;
 }
