@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
+// import App from './App';
 import reportWebVitals from './reportWebVitals';
 // Stuff for routing, we'll be using react router
 import {
@@ -26,6 +26,26 @@ const router = createBrowserRouter([
     element: <Home />,
     errorElement: <ErrorPage />
   },
+  {
+    path: "about",
+    element: <About />
+  },
+  {
+    path: "history",
+    element: <History />
+  },
+  {
+    path: "login",
+    element: <Login />
+  },
+  {
+    path: "response",
+    element: <Response />
+  },
+  {
+    path: "signup",
+    element: <SignUp />
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
