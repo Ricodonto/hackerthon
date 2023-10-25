@@ -3,11 +3,35 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+// Stuff for routing, we'll be using react router
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+// Importing the content of each or our routes
+import About from './About/page';
+import History from './History/page';
+import Home from './Home/page';
+import Login from './Login/page';
+import Response from './Response/page';
+import SignUp from './SignUp/page';
+import ErrorPage from './Error/page';
+
+// Defining the router that our app will be using
+const router = createBrowserRouter([
+  // Each route is defined as the path of the route and the content to show on that route
+  {
+    path: "/",
+    element: <Home />,
+    errorElement: <ErrorPage />
+  },
+]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
 
