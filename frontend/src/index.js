@@ -17,34 +17,41 @@ import Login from './Login/page';
 import Response from './Response/page';
 import SignUp from './SignUp/page';
 import ErrorPage from './Error/page';
+import Root from './Root/page';
 
 // Defining the router that our app will be using
 const router = createBrowserRouter([
   // Each route is defined as the path of the route and the content to show on that route
   {
     path: "/",
-    element: <Home />,
-    errorElement: <ErrorPage />
-  },
-  {
-    path: "about",
-    element: <About />
-  },
-  {
-    path: "history",
-    element: <History />
-  },
-  {
-    path: "login",
-    element: <Login />
-  },
-  {
-    path: "response",
-    element: <Response />
-  },
-  {
-    path: "signup",
-    element: <SignUp />
+    element: <Root />,
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: 'home',
+        element: <Home />
+      },
+      {
+        path: "about",
+        element: <About />
+      },
+      {
+        path: "history",
+        element: <History />
+      },
+      {
+        path: "login",
+        element: <Login />
+      },
+      {
+        path: "response",
+        element: <Response />
+      },
+      {
+        path: "signup",
+        element: <SignUp />
+      }
+    ]
   }
 ]);
 
