@@ -22,7 +22,4 @@ export async function sendLoginDetails(username, password) {
         console.log(err);
         throw new Error("Could Not Log In");
     }
-    return new Promise((res, rej) => {
-
-    })
 }
