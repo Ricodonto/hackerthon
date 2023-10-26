@@ -10,6 +10,7 @@ h2 {
 .form-input, .form-input-error {
     display: block;
     border: 1px solid black;
+    font-family: 'Inter', sans-serif;
     border-radius: 13px;
     width: 317px;
     height: 47px;
@@ -44,12 +45,19 @@ main {
 
 .form-label, .form-label-error {
     font-size: 14px;
+    font-family: 'Inter', sans-serif;
     display: block;
     margin-bottom: 7px;
 }
 
 .form-label-error {
     color: red;
+}
+
+.error-message {
+    color: red;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
 }
 
 .login-button {
