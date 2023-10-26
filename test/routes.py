@@ -123,8 +123,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Store information in session 
-        session['username'] = username
+        print(f"Username is {username} and password is {password}")
+
         # Fetch user with username
         # Create connection to supabase
         print(4)
@@ -144,7 +144,8 @@ def login():
             # Set error to true
             error = True
             error_message = "Invalid Credentials"
-            return render_template("login.html", error=error, error_message=error_message)
+            # return render_template("login.html", error=error, error_message=error_message)
+            return jsonify({"error": error_message}), 400
 
         # Compare hashed passwords
         print(8)
