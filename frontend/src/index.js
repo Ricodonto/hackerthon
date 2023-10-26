@@ -19,9 +19,9 @@ import SignUp from './SignUp/page';
 import ErrorPage from './Error/page';
 import Root from './Root/page';
 
-// Defining the router that our app will be using
+// Defining routes
 const router = createBrowserRouter([
-  // Each route is defined as the path of the route and the content to show on that route
+  // Each route is defined as the path of the route and the content to show on that route, we're defining data routes
   {
     path: "/",
     element: <Root />,
@@ -47,11 +47,13 @@ const router = createBrowserRouter([
   },
   {
     path: "signup",
-    element: <SignUp />
+    element: <SignUp />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "login",
-    element: <Login />
+    element: <Login />,
+    errorElement: <ErrorPage />,
   }
 ]);
 
