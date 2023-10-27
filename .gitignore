@@ -5,3 +5,4 @@ setUpDatabase.ipynb
 recommendation_history.json
 .hackerthon
 test\__pycache__
+.hackerthon
