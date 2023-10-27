@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+    <main>
+        <h2 class="login-heading">Register to your Bookfinder account</h2>
+        <form class="login-form" action="{{ url_for('routes.signup')}}" method="post">
+            {% if error == True%}
+            <div class="email">
+                <label for="email-text-input" class="form-label-error">Email Address</label>
+                <input required type="text" id="email-text-input" name="username" placeholder="Username" class="form-input-error">
+            </div>
+            {% else %}
+            <div class="email">
+                <label for="email-text-input" class="form-label">Email Address</label>
+                <input required type="text" id="email-text-input" name="username" placeholder="Username" class="form-input">
+            </div>
+            {% endif %}
+            <div class="password">
+                <label for="password-input" class="form-label">Password</label>
+                <input required type="password" id="password-input" name="password" placeholder="Password" class="form-input">
+            </div>
+            {% if error == True %}
+            <p class="error-message">{{ error_message }}</p>
+            {% endif %}
+            <input class="login-button" class="login-button" type="submit" value="Register">
+        </form>
+        <div style="text-align: center;">
+            <div class="redirect-to-login">
+                <p style="display: inline;">Already Have An Account, </p>
+                <a href="/login" class="inline-link">Log In</a>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

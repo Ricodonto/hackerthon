@@ -1,0 +1,64 @@
+{% extends "base_template.html" %}
+{% block content %}
+<h1>Recommendation History</h1><br><br>
+
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <fieldset>
+        <p>{{ form.prompt.label }}</p>
+        <p>{{ form.submit() }}</p>
+    </fieldset>
+</form>
+
+{% if history|length > 0 %}
+    {% for item in history %}
+        <p>Prompt: {{ item.user_prompt }}</p><br>
+        <p>Recommended Books</p><br>
+
+        {% set table_length = item.recommendation.title|length %}
+
+        {% if table_length > 0 %}
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Book Image</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>Description</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(table_length) %}
+                        <tr>
+                            <td>
+                                <img src="{{ item.recommendation.images[i] }}" alt="Book Image"><br>
+                            </td>
+                            <td>
+                                {{ item.recommendation.title[i] }}<br>
+                            </td>
+                            <td>
+                                {{ item.recommendation.author[i] }}<br>
+                            </td>
+                            <td>
+                                {{ item.recommendation.isbn[i] }}<br>
+                            </td>
+                            <td>
+                                {{ item.recommendation.description[i] }}<br>
+                            </td>
+                            <td>
+                                {{ item.recommendation.ratings[i] }}<br>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h2>Empty</h2>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <h2>Empty</h2>
+{% endif %}
+{% endblock %}
