@@ -1,9 +1,9 @@
 import datetime
 import json
 from flask import Blueprint, redirect, render_template, request, url_for, session
-from AI.forms import PromptForm
-from AI.forms import DeleteForm
-from AI.chatgpt import ai, cleanup, response_organizer
+from forms import PromptForm
+from forms import DeleteForm
+from chatgpt import ai, cleanup, response_organizer
 from flask import jsonify
 
 import os
@@ -48,6 +48,7 @@ def landing():
         data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userId['data'][0]['id']}).execute()
         print(data)
         promptid = data['data'][0]['id']
+        # The session prompt might not be useful
         session['prompt'] = prompt
         
         print(7)
@@ -55,6 +56,7 @@ def landing():
         
         print(8)
         response = cleanup()
+
         if os.path.isfile("response.txt"):
             os.remove("response.txt")
         response = response_organizer(response)
@@ -265,22 +267,59 @@ def about():
         return redirect('/login')
     return render_template("about.html")
 
+
 @routes.route("/history", methods=['GET', 'POST'])
 def history():
     if "username" not in session:
         return redirect('/login')
-    # Read the recommendation history from the JSON file
-    try:
-        with open("recommendation_history.json", "r") as file:
-            history = json.load(file)
-    except FileNotFoundError:
-        history = []
+    
+    if request.method == 'GET':
+        print(2)
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        client = create_client(supabase_url=url, supabase_key=key)
 
-    form = DeleteForm()
-    if form.is_submitted() and form.validate_on_submit():
-        with open("recommendation_history.json", "w") as file:
-            json.dump([], file)  # Just write the empty list, no need to assign the result to a variable
-        return redirect(url_for("routes.history"))
+        print(3)
+        data = client.table('Users').select('id').eq('username', session['username']).execute()
+        userID = data['data'][0]['id']
+        data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+        history = data['data']
+        
+        print(4)
+        print(history)
+        for item in range(len(history)):
+            data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
 
-    # Render the HTML template and pass the history data to it
-    return render_template("history.html", history=history, form=form)
+            if len(data['data']) == 0:
+                pass
+            else:
+                history[item]['response'] = []
+                for book in range(len(data['data'])):
+                    history[item]['response'].append(data['data'][book])
+
+        return history
+
+    else:
+        print("deleted")
+
+
+
+# @routes.route("/history", methods=['GET', 'POST'])
+# def history():
+#     if "username" not in session:
+#         return redirect('/login')
+#     # Read the recommendation history from the JSON file
+#     try:
+#         with open("recommendation_history.json", "r") as file:
+#             history = json.load(file)
+#     except FileNotFoundError:
+#         history = []
+
+#     form = DeleteForm()
+#     if form.is_submitted() and form.validate_on_submit():
+#         with open("recommendation_history.json", "w") as file:
+#             json.dump([], file)  # Just write the empty list, no need to assign the result to a variable
+#         return redirect(url_for("routes.history"))
+
+#     # Render the HTML template and pass the history data to it
+#     return render_template("history.html", history=history, form=form)

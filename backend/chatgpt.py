@@ -3,7 +3,7 @@ import re
 from dotenv import load_dotenv
 from flask import request
 load_dotenv('.env')
-from AI.forms import PromptForm
+from forms import PromptForm
 
 import openai
 import json
