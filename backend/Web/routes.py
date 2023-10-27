@@ -3,7 +3,7 @@ import json
 from flask import Blueprint, redirect, render_template, request, url_for, session
 from AI.forms import PromptForm
 from AI.forms import DeleteForm
-from AI.chatgpt import ai, cleanup
+from AI.chatgpt import ai, cleanup, response_organizer
 from flask import jsonify
 
 import os
@@ -20,29 +20,117 @@ routes = Blueprint(__name__,"route")
 def landing():
     if "username" not in session:
         return redirect('/login')
-
+    
+   
     form = PromptForm()
-    if form.is_submitted():
-        result = request.form
-        response = {}
-        # Ensuring that the user sumbitted a filled in response and returning an error message if they havent
-        if result["prompt"] == "":
-            return render_template("landing_page.html", form=form, errormsg="Fill in the prompt")
-        
-        forwd_prompt = str(result["prompt"])
-        response["prompt"] = forwd_prompt
-        response = ai(forwd_prompt)
-        array_response = cleanup()
-        array_response["prompt"] = result["prompt"]
+    if request.method == 'GET':
+        print(2)
+        return render_template("landing_page.html", form=form)
+    
+    if request.method == 'POST':
+        print(3)
+        prompt: str = request.form['prompt']
 
-        # Deleting the response text file that was generated
+        if len(prompt) == 0:
+            print(4)
+            error = True
+            error_message = "Enter a prompt"
+            return jsonify({"error": error_message}), 400
+        
+        print(5)
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        client = create_client(supabase_url=url, supabase_key=key)
+
+
+        print(6)
+        userId = client.table("Users").select("id").eq('username',session['username']).execute()
+        data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userId['data'][0]['id']}).execute()
+        print(data)
+        promptid = data['data'][0]['id']
+        session['prompt'] = prompt
+        
+        print(7)
+        response = ai(prompt)
+        
+        print(8)
+        response = cleanup()
         if os.path.isfile("response.txt"):
             os.remove("response.txt")
+        response = response_organizer(response)
+        print(response)
+        session['response'] = 'response'
+        print(9)
+        for book in response:
+            client.table("Responses").insert({"prompt_id": promptid, 
+                                              "book_title": book['title'],
+                                              "isbn":book['isbn'],
+                                              "author":book['author'],
+                                              "description":book['description'],
+                                              "rating":book['rating'],
+                                              "image":book['image']}).execute()
+        return {response}, 400
+        
+response_sample = [
+{
+"author": "Harper Lee",
+"description": "Set in the 1930s, this classic novel by Harper Lee explores themes of racial injustice and the loss of innocence through the eyes of Scout Finch.",
+"image": "https://covers.openlibrary.org/b/isbn/9780060935467-M.jpg",
+"isbn": "9780060935467",
+"rating": "4.27/5",
+"title": "To Kill a Mockingbird"
+},
+{
+"author": "George Orwell",
+"description": "George Orwell's dystopian novel depicts a totalitarian society where individualism is suppressed and government surveillance is pervasive.",
+"image": "https://covers.openlibrary.org/b/isbn/9780451524935-M.jpg",
+"isbn": "9780451524935",
+"rating": "4.17/5",
+"title": "1984"
+},
+{
+"author": "F. Scott Fitzgerald",
+"description": "F. Scott Fitzgerald's masterpiece delves into the decadence and disillusionment of the Jazz Age, as seen through the eyes of Jay Gatsby.",
+"image": "https://covers.openlibrary.org/b/isbn/9780743273565-M.jpg",
+"isbn": "9780743273565",
+"rating": "3.92/5",
+"title": "The Great Gatsby"
+},
+{
+"author": "Jane Austen",
+"description": "Jane Austen's beloved novel follows the spirited Elizabeth Bennet as she navigates societal expectations, love, and the complexities of class.",
+"image": "https://covers.openlibrary.org/b/isbn/9780141439518-M.jpg",
+"isbn": "9780141439518",
+"rating": "4.26/5",
+"title": "Pride and Prejudice"
+}
+]
+# @routes.route("/", methods=['GET', 'POST'])
+# def landing():
+#     if "username" not in session:
+#         return redirect('/login')
 
-        # return array_response
-        return render_template("book_table.html", details=array_response)
+#     form = PromptForm()
+#     if form.is_submitted():
+#         result = request.form
+#         response = {}
+#         # Ensuring that the user sumbitted a filled in response and returning an error message if they havent
+#         if result["prompt"] == "":
+#             return render_template("landing_page.html", form=form, errormsg="Fill in the prompt")
+        
+#         forwd_prompt = str(result["prompt"])
+#         response["prompt"] = forwd_prompt
+#         response = ai(forwd_prompt)
+#         array_response = cleanup()
+#         array_response["prompt"] = result["prompt"]
 
-    return render_template("landing_page.html", form=form)
+#         # Deleting the response text file that was generated
+
+
+#         # return array_response
+#         return render_template("book_table.html", details=array_response)
+
+#     return render_template("landing_page.html", form=form)
 
 # Route for sign up
 @routes.route("/signup", methods=["GET", "POST"])

@@ -131,10 +131,64 @@ def clear_history_file():
     with open("recommendation_history.json", "w") as file:
         json.dump([], file)
 
+response = {
+"author": [
+"Harper Lee",
+"George Orwell",
+"F. Scott Fitzgerald",
+"Jane Austen"
+],
+"description": [
+"Set in the 1930s, this classic novel by Harper Lee explores themes of racial injustice and the loss of innocence through the eyes of Scout Finch.",
+"George Orwell's dystopian novel depicts a totalitarian society where individualism is suppressed and government surveillance is pervasive.",
+"F. Scott Fitzgerald's masterpiece delves into the decadence and disillusionment of the Jazz Age, as seen through the eyes of Jay Gatsby.",
+"Jane Austen's beloved novel follows the spirited Elizabeth Bennet as she navigates societal expectations, love, and the complexities of class."
+],
+"images": [
+"https://covers.openlibrary.org/b/isbn/9780060935467-M.jpg",
+"https://covers.openlibrary.org/b/isbn/9780451524935-M.jpg",
+"https://covers.openlibrary.org/b/isbn/9780743273565-M.jpg",
+"https://covers.openlibrary.org/b/isbn/9780141439518-M.jpg"
+],
+"isbn": [
+"9780060935467",
+"9780451524935",
+"9780743273565",
+"9780141439518"
+],
+"ratings": [
+"4.27/5",
+"4.17/5",
+"3.91/5",
+"4.26/5"
+],
+"title": [
+"To Kill a Mockingbird",
+"1984",
+"The Great Gatsby",
+"Pride and Prejudice"
+]
+}
+
+def response_organizer(response):
+    books = []
+    for seq in range(len(response['title'])):
+        book = {}
+        book['author'] = response['author'][seq]
+        book['description'] = response['description'][seq]
+        book['image'] = response['images'][seq]
+        book['isbn'] = response['isbn'][seq]
+        book['rating'] = response['ratings'][seq] 
+        book['title'] = response['title'][seq]
+        books.append(book)
+    return books
+        
 # Register the cleanup function to run on exit
 atexit.register(clear_history_file)
 
 if __name__ == '__main__':
     # For testing purposes
-    ai("cooking books")
-    print(cleanup())
+    # ai("cooking books")
+    # print(cleanup())
+    print(response_organizer(response))
+
