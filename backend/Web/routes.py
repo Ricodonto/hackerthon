@@ -18,9 +18,11 @@ routes = Blueprint(__name__,"route")
 
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
-    if "username" not in session:
-        return redirect('/login')
+    if len(request.form['username']) <= 0:
+        # return redirect('/login')
+        return jsonify({"error": "Not Logged In"}), 400
     
+    username = request.form['username']
    
     form = PromptForm()
     if request.method == 'GET':
@@ -44,7 +46,9 @@ def landing():
 
 
         print(6)
-        userId = client.table("Users").select("id").eq('username',session['username']).execute()
+        # userId = client.table("Users").select("id").eq('username',session['username']).execute()
+        userId = client.table("Users").select("id").eq('username',username).execute()
+
         data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userId['data'][0]['id']}).execute()
         print(data)
         promptid = data['data'][0]['id']
@@ -69,7 +73,7 @@ def landing():
                                               "description":book['description'],
                                               "rating":book['rating'],
                                               "image":book['image']}).execute()
-        return {response}, 400
+        return response, 400
         
 response_sample = [
 {
