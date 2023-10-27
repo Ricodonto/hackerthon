@@ -26,7 +26,7 @@ export default function History() {
     }
 
     return (
-        <main>
+        <div className='content-page'>
             <div className='history'>
                 <h2>History</h2>
                 <MyButton text={"Delete History"} 
@@ -48,7 +48,7 @@ export default function History() {
                     />
                 })}
             </section>
-        </main>
+        </div>
     );
 }
 

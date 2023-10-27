@@ -23,7 +23,7 @@ export default function Home() {
     }
 
     return (
-        <main>
+        <div className='content-page'>
             {/* Search Bar */}
             <section className='search-bar'>
                 <form>
@@ -50,7 +50,7 @@ export default function Home() {
                     />
                 })}
             </section>
-        </main>
+        </div>
     );
 }
 

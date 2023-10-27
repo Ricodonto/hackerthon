@@ -2,7 +2,7 @@ import './styles.css';
 
 export default function About() {
     return (
-        <main>
+        <div className='content-page'>
             <h2>About BookFinder</h2>
             <p>Welcome to Bookfinder, your go-to online book recommender designed for students and book enthusiasts alike.</p>
             <p>With Bookfinder, you can simply ask for book recommendations and get personalized suggestions tailored to your interests and preferences.</p>
@@ -25,7 +25,7 @@ export default function About() {
                     sentence2={"This allows you to quickly assess which book might be your next literary adventure."}
                 />
             </section>
-        </main>
+        </div>
     );
 }
 

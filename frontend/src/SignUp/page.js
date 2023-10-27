@@ -25,7 +25,7 @@ export default function SignUp() {
     }
 
     return (
-        <main>
+        <div>
             <h2>Register to your Bookfinder account</h2>
             <form className="login-form" onSubmit={handleSubmit}>
                 <div className="email">
@@ -99,6 +99,6 @@ export default function SignUp() {
                     <Link to="/login" class="inline-link">Log In</Link>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

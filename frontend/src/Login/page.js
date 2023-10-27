@@ -26,7 +26,7 @@ export default function Login() {
 
 
     return (
-        <main>
+        <div>
             <h2>Sign into your Bookfinder account</h2>
             <form className="login-form" onSubmit={handleSubmit}>
                 <div className="email">
@@ -100,6 +100,6 @@ export default function Login() {
                     <Link to="/signup" className="inline-link">Sign Up</Link>
                 </div>
             </div>
-        </main>
+        </div>
     );
 }

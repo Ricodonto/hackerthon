@@ -1,3 +1,9 @@
+.content-page {
+    margin-top: 75px;
+    padding: 20px;
+    min-height: 100vh;
+}
+
 .search-bar {
     display: flex;
     flex-direction: row;

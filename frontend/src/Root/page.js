@@ -3,7 +3,7 @@ import './styles.css'
 
 export default function Root() {
     return (
-        <>
+        <body className="root">
             {/* The Nav Bar At The Top */}
             <div className="navbar">
                 <UserImage initial={'R'} name={'Roman Njoroge'} />
@@ -11,21 +11,19 @@ export default function Root() {
             </div>
             <Links />
             {/* all the other elements */}
-            <div id="detail" className="content">
-                <Outlet />
-            </div>
+            <Outlet />
             {/* A footer */}
             <footer>
                 <p>© 2023 BookFinder.</p>
             </footer>
-        </>
+        </body>
     );
 }
 
 function Links() {
     return (
         <div className="links">
-            <Link to={'home'} className="link"><LinkBox text={'Home'} /></Link>
+            <Link to={'/'} className="link"><LinkBox text={'Home'} /></Link>
             <Link to={'about'} className="link"><LinkBox text={'About'} /></Link>
             <Link to={'history'} className="link"><LinkBox text={'History'} /></Link>
         </div>
