@@ -1,9 +1,9 @@
 import datetime
 import json
 from flask import Blueprint, redirect, render_template, request, url_for, session
-from forms import PromptForm
-from forms import DeleteForm
-from chatgpt import ai, cleanup
+from AI.forms import PromptForm
+from AI.forms import DeleteForm
+from AI.chatgpt import ai, cleanup
 from flask import jsonify
 
 import os
