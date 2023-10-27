@@ -1,5 +1,5 @@
 import datetime
-import json
+import json, re
 from flask import Blueprint, redirect, render_template, request, url_for, session
 from forms import PromptForm
 from forms import DeleteForm
@@ -18,55 +18,72 @@ routes = Blueprint(__name__,"route")
 
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
-    if len(request.form['username']) <= 0:
-        # return redirect('/login')
+
+    # Check whether there is a signed in username in session
+    if 'username' not in list(session.keys()):
+        # return redirect('/signup')
         return jsonify({"error": "Not Logged In"}), 400
+        # username = request.form['username']
     
-    username = request.form['username']
-   
     form = PromptForm()
+    # load the landing page if no form is being submitted
     if request.method == 'GET':
         print(2)
         return render_template("landing_page.html", form=form)
     
     if request.method == 'POST':
         print(3)
+        # get the prompt from the form submitted
         prompt: str = request.form['prompt']
 
+        # Check if the prompt was empty and raise an error if necessary
         if len(prompt) == 0:
             print(4)
             error = True
             error_message = "Enter a prompt"
             return jsonify({"error": error_message}), 400
         
+        # load the supabase url and the key
         print(5)
         url = os.environ.get("SUPABASE_URL")
         key = os.environ.get("SUPABASE_KEY")
         client = create_client(supabase_url=url, supabase_key=key)
 
-
+        # get the current user's id and to insert an entry into the prompt table
         print(6)
-        # userId = client.table("Users").select("id").eq('username',session['username']).execute()
-        userId = client.table("Users").select("id").eq('username',username).execute()
-
-        data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userId['data'][0]['id']}).execute()
+        userId = client.table("Users").select("id").eq('username',session['username']).execute()
+        userId = userId['data'][0]['id']
+        data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userId}).execute()
         print(data)
         promptid = data['data'][0]['id']
-        # The session prompt might not be useful
-        session['prompt'] = prompt
         
+        # Prompt GPT for recommendations
         print(7)
         response = ai(prompt)
         
+        # Creating a log entry of the raw response from GPT
         print(8)
+        with open('response.txt', 'r') as file:
+            dict_lines = {'response':[]}
+            for line in file:
+                dict_lines['response'].append(line)
+            client.table("Logs").insert({"raw_response": json.dumps(dict_lines), "user_id": userId,'prompt_id': promptid}, ).execute()
+
+
+        # Cleaning up the response from GPT
+        print(9)
         response = cleanup()
 
+        # Deleting the file created to temporarily hold the response
+        print(11)
         if os.path.isfile("response.txt"):
             os.remove("response.txt")
         response = response_organizer(response)
         print(response)
         session['response'] = 'response'
-        print(9)
+        
+        # Adding an entry of the usable response to the response table
+        print(10)
         for book in response:
             client.table("Responses").insert({"prompt_id": promptid, 
                                               "book_title": book['title'],
@@ -75,42 +92,8 @@ def landing():
                                               "description":book['description'],
                                               "rating":book['rating'],
                                               "image":book['image']}).execute()
-        return response, 400
+        return response
         
-response_sample = [
-{
-"author": "Harper Lee",
-"description": "Set in the 1930s, this classic novel by Harper Lee explores themes of racial injustice and the loss of innocence through the eyes of Scout Finch.",
-"image": "https://covers.openlibrary.org/b/isbn/9780060935467-M.jpg",
-"isbn": "9780060935467",
-"rating": "4.27/5",
-"title": "To Kill a Mockingbird"
-},
-{
-"author": "George Orwell",
-"description": "George Orwell's dystopian novel depicts a totalitarian society where individualism is suppressed and government surveillance is pervasive.",
-"image": "https://covers.openlibrary.org/b/isbn/9780451524935-M.jpg",
-"isbn": "9780451524935",
-"rating": "4.17/5",
-"title": "1984"
-},
-{
-"author": "F. Scott Fitzgerald",
-"description": "F. Scott Fitzgerald's masterpiece delves into the decadence and disillusionment of the Jazz Age, as seen through the eyes of Jay Gatsby.",
-"image": "https://covers.openlibrary.org/b/isbn/9780743273565-M.jpg",
-"isbn": "9780743273565",
-"rating": "3.92/5",
-"title": "The Great Gatsby"
-},
-{
-"author": "Jane Austen",
-"description": "Jane Austen's beloved novel follows the spirited Elizabeth Bennet as she navigates societal expectations, love, and the complexities of class.",
-"image": "https://covers.openlibrary.org/b/isbn/9780141439518-M.jpg",
-"isbn": "9780141439518",
-"rating": "4.26/5",
-"title": "Pride and Prejudice"
-}
-]
 # @routes.route("/", methods=['GET', 'POST'])
 # def landing():
 #     if "username" not in session:
@@ -185,6 +168,18 @@ def signup():
             error_message = "User Already Exists"
             # return render_template("signup.html", error=error, error_message=error_message)
             return jsonify({"error": error_message}), 400
+        
+        # If username is invalid return error
+        print(-7)
+        print(username)
+        # regular expression check to ensure the username only contains word characters
+        if re.search(r"^[\w]+$", username):
+            print("Valid")
+
+        else:
+            error = True
+            error_message = "Username is invalid"
+            return jsonify({'error':error_message}), 400            
 
         # Hash password
         print(9)
@@ -199,6 +194,7 @@ def signup():
         print(data, error)
         print(11)
         session['username'] = username
+
 
         return {}, 200
 
@@ -274,13 +270,20 @@ def about():
 
 @routes.route("/history", methods=['GET', 'POST'])
 def history():
-    # if "username" not in session:
-    #     return redirect('/login')
-    if len(request.form['username']) <= 0:
-        # return redirect('/login')
-        return jsonify({"error": "Not Logged In"}), 400
-    username = request.form['username']
     
+    # Checking if username is in the current session
+    if 'username' not in list(session.keys()):
+        return redirect('/signup')
+        # return jsonify({"error": "Not Logged In"}), 400
+        # username = request.form['username']    
+    # # if "username" not in session:
+    # #     return redirect('/login')
+    # if len(request.form['username']) <= 0:
+    #     # return redirect('/login')
+    #     return jsonify({"error": "Not Logged In"}), 400
+    # username = request.form['username']
+    
+    # Checking if the user wishes to view their history
     if request.method == 'GET':
         print(2)
         url = os.environ.get("SUPABASE_URL")
@@ -288,8 +291,8 @@ def history():
         client = create_client(supabase_url=url, supabase_key=key)
 
         print(3)
-        # data = client.table('Users').select('id').eq('username', session['username']).execute()
-        data = client.table("Users").select("id").eq('username',username).execute()
+        # Getting the user's id and past prompt ids'
+        data = client.table("Users").select("id").eq('username',session['username']).execute()
         userID = data['data'][0]['id']
         data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
         history = data['data']
@@ -299,15 +302,18 @@ def history():
         for item in range(len(history)):
             data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
 
+            # Checking whether past prompt id had an empty prompt
             if len(data['data']) == 0:
                 pass
             else:
+                # Appending the response data to their respoective prompt id
                 history[item]['response'] = []
                 for book in range(len(data['data'])):
                     history[item]['response'].append(data['data'][book])
 
         return history
 
+    # if someone sends a POST request they will delete the history, allow specific history to be deleted
     else:
         print("deleted")
 
