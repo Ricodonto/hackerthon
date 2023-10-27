@@ -274,8 +274,12 @@ def about():
 
 @routes.route("/history", methods=['GET', 'POST'])
 def history():
-    if "username" not in session:
-        return redirect('/login')
+    # if "username" not in session:
+    #     return redirect('/login')
+    if len(request.form['username']) <= 0:
+        # return redirect('/login')
+        return jsonify({"error": "Not Logged In"}), 400
+    username = request.form['username']
     
     if request.method == 'GET':
         print(2)
@@ -284,7 +288,8 @@ def history():
         client = create_client(supabase_url=url, supabase_key=key)
 
         print(3)
-        data = client.table('Users').select('id').eq('username', session['username']).execute()
+        # data = client.table('Users').select('id').eq('username', session['username']).execute()
+        data = client.table("Users").select("id").eq('username',username).execute()
         userID = data['data'][0]['id']
         data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
         history = data['data']

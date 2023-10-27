@@ -1,4 +1,4 @@
-from Web.page import app
+from page import app
 import unittest
 
 class TestApp(unittest.TestCase):

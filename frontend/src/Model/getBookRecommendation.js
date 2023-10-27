@@ -1,13 +1,14 @@
 import UserProfile from "./userSession";
 import { url } from "./constants";
 
-export async function signup(username, password) {
+export async function getBookRecommendation(prompt) {
     try {   
+        let username = UserProfile.getName();
         let formdata = new FormData();
         formdata.append('username', username);
-        formdata.append('password', password);
+        formdata.append('prompt', prompt);
         let response = await fetch(
-            `${url}/signup`,
+            `${url}/`,
             {
                 method: 'POST',
                 body: formdata
@@ -17,12 +18,12 @@ export async function signup(username, password) {
         let json = await response.json();
         if (response.status !== 200) {
             console.log(json);
-            throw new Error("Could Not Register Account")
+            throw new Error("Could Not Get Recommendation")
         }
 
-        UserProfile.setName(username);
+        return json;
     } catch(err) {
         console.log(err);
-        throw new Error("Could Not Register Account");
+        throw new Error("Could Not Get Recommendation");
     }
 }

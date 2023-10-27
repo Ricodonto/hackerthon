@@ -1,6 +1,7 @@
 import { FiSearch } from 'react-icons/fi';
 import './styles.css';
 import { useState } from 'react';
+import { getBookRecommendation } from '../Model/getBookRecommendation';
 
 export default function Home() {
     const [searchResults, setSearchResults] = useState([
@@ -15,6 +16,7 @@ export default function Home() {
             moreInfoLink: "https://openlibrary.org/works/OL34924410W/Harry_Potter_And_The_Sorcer%27s_Stone?edition=key%3A/books/OL7893441M"
         }
     ]);
+    const [prompt, setPrompt] = useState("");
 
     function handleShowSummary(i) {
         const newSearchResults = searchResults.slice()
@@ -22,12 +24,29 @@ export default function Home() {
         setSearchResults(newSearchResults)
     }
 
+    async function handleSubmit(event) {
+        event.preventDefault();
+        console.log("Clicked")
+        try {
+            let response = await getBookRecommendation(prompt);
+            setSearchResults(response)
+        } catch(err) {
+            console.log("OH SHIT!")
+        }
+    }
+
     return (
         <div className='content-page'>
             {/* Search Bar */}
             <section className='search-bar'>
-                <form>
-                    <input type="text" placeholder="I want books on..." name="search_term" className='search-text-field' />
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="text" 
+                        placeholder="I want books on..." 
+                        className='search-text-field' 
+                        value={prompt}
+                        onChange={(e) => setPrompt(e.target.value)}    
+                    />
                     <button type="submit" className='search-button'><FiSearch /></button>
                 </form>
             </section>

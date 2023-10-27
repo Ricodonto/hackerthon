@@ -1,4 +1,4 @@
-from Web.page import app
+from page import app
 
 if __name__ == "main":
     app.run()
