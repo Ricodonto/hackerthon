@@ -1,0 +1,74 @@
+h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 27px;
+}
+
+.email, .password {
+    margin-bottom: 16px;
+}
+
+.form-input, .form-input-error {
+    display: block;
+    border: 1px solid black;
+    font-family: 'Inter', sans-serif;
+    border-radius: 13px;
+    width: 317px;
+    height: 47px;
+    padding-left: 15px;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.inline-link {
+    display: inline;
+    text-decoration: none;
+    color: red;
+}
+
+.redirect-to-login {
+    font-size: 16px;
+    display: inline-block;
+    margin: 46px auto;
+}
+
+.login-form {
+    border: 1px solid black;
+    border-radius: 13px;
+    padding: 70px 85px;
+}
+
+.form-label, .form-label-error {
+    font-size: 14px;
+    font-family: 'Inter', sans-serif;
+    display: block;
+    margin-bottom: 7px;
+}
+
+.form-label-error {
+    color: red;
+}
+
+.error-message {
+    color: red;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+}
+
+.login-button {
+    width: 332px;
+    height: 47px;
+    border: 1px solid black;
+    border-radius: 13px;
+    margin-top: 23px;
+    background-color: rgb(217, 217, 217);
+}
+
+.form-input-error {
+    border: 1px solid red;
+}

@@ -1,0 +1,27 @@
+h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 27px;
+}
+
+.search-result {
+    border: 1px solid;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-image {
+    width: 250px;
+    height: 250px;
+}

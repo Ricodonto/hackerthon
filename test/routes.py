@@ -67,7 +67,8 @@ def signup():
             print(4)
             error = True
             error_message = "Invalid Credentials"
-            return render_template("signup.html", error=error, error_message=error_message)
+            # return render_template("signup.html", error=error, error_message=error_message)
+            return jsonify({"error": error_message}), 400
 
         # Check if user already exists
         
@@ -88,7 +89,8 @@ def signup():
             print(8)
             error = True
             error_message = "User Already Exists"
-            return render_template("signup.html", error=error, error_message=error_message)
+            # return render_template("signup.html", error=error, error_message=error_message)
+            return jsonify({"error": error_message}), 400
 
         # Hash password
         print(9)
@@ -104,7 +106,7 @@ def signup():
         print(11)
         session['username'] = username
 
-        return redirect('/')
+        return {}, 200
 
 # Route for login
 @routes.route("/login", methods=['GET', 'POST'])
@@ -123,8 +125,8 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        # Store information in session 
-        session['username'] = username
+        print(f"Username is {username} and password is {password}")
+
         # Fetch user with username
         # Create connection to supabase
         print(4)
@@ -144,7 +146,8 @@ def login():
             # Set error to true
             error = True
             error_message = "Invalid Credentials"
-            return render_template("login.html", error=error, error_message=error_message)
+            # return render_template("login.html", error=error, error_message=error_message)
+            return jsonify({"error": error_message}), 400
 
         # Compare hashed passwords
         print(8)
@@ -158,13 +161,15 @@ def login():
             session['username'] = username
 
             # Redirect to home page
-            return redirect("/")
+            # return redirect("/")
+            return {}, 200
         else:
             print(10)
             error = True
             error_message = "Invalid Credentials"
             # Show error screen
-            return render_template("login.html", error=error, error_message=error_message)
+            # return render_template("login.html", error=error, error_message=error_message)
+            return {"error": error_message}, 400
 
 @routes.route("/about")
 def about():
