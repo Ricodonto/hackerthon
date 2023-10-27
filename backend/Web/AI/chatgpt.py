@@ -3,7 +3,7 @@ import re
 from dotenv import load_dotenv
 from flask import request
 load_dotenv('.env')
-from forms import PromptForm
+from AI.forms import PromptForm
 
 import openai
 import json
@@ -47,7 +47,6 @@ def cleanup():
     ratings = []
     descriptions = []
     images = []
-    urls = []
     current_recommendation = {}
 
     for line in lines:
@@ -72,7 +71,6 @@ def cleanup():
             ratings.append(current_recommendation.get("ratings", ""))
             descriptions.append(current_recommendation.get("description", ""))
             images.append(f"https://covers.openlibrary.org/b/isbn/{current_recommendation.get('isbn', '')}-M.jpg")
-            urls.append(f"https://openlibrary.org/isbn/{current_recommendation.get('isbn', '')}")
             current_recommendation = {}
 
     # Returning an array containing the lists of required data
@@ -82,8 +80,7 @@ def cleanup():
         "isbn": isbns,
         "ratings": ratings,
         "description": descriptions,
-        "images": images,
-        "urls": urls
+        "images": images
     }
     record_recommendation(details)
     return details
@@ -124,8 +121,7 @@ def record_recommendation(details):
                     "isbn": recommendation["recommendation"]["isbn"],
                     "ratings": recommendation["recommendation"]["ratings"],
                     "description": recommendation["recommendation"]["description"],
-                    "images": recommendation["recommendation"]["images"],
-                    "urls": recommendation["recommendation"]["urls"]
+                    "images": recommendation["recommendation"]["images"]
                 }
             }
             serialized_history.append(serialized_recommendation)

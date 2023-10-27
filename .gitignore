@@ -2,8 +2,7 @@
 .env
 env
 setUpDatabase.ipynb
-test/__pycache__
-test/__pycache__/chatgpt.cpython-311.pyc
-test/__pycache__/forms.cpython-311.pyc
-test/__pycache__/routes.cpython-311.pyc
-__pycache__
+recommendation_history.json
+.hackerthon
+test\__pycache__
+.hackerthon
