@@ -18,6 +18,7 @@ import Response from './Response/page';
 import SignUp from './SignUp/page';
 import ErrorPage from './Error/page';
 import Root from './Root/page';
+import Settings from './Settings/page';
 
 // Defining routes
 const router = createBrowserRouter([
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "response",
         element: <Response />
+      },
+      {
+        path: "settings",
+        element: <Settings />
       },
     ]
   },
