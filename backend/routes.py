@@ -1,8 +1,7 @@
 import datetime
 import json, re
+from simplejson.errors import JSONDecodeError
 from flask import Blueprint, redirect, render_template, request, url_for, session
-from forms import PromptForm
-from forms import DeleteForm
 from chatgpt import ai, cleanup, response_organizer
 from openlibrary import *
 from flask import jsonify
@@ -27,7 +26,6 @@ def landing():
         return jsonify({"error": "Not Logged In"}), 400
         # username = request.form['username']
     
-    form = PromptForm()
     # load the landing page if no form is being submitted
     if request.method == 'GET':
         print(2)
@@ -95,6 +93,7 @@ def landing():
                                               "description":book['description'],
                                               "rating":book['rating'],
                                               "image":book['image']}).execute()
+        print(response)
         return response
 
 @routes.route("/currently_reading", methods=['GET','POST'])
@@ -163,7 +162,7 @@ def current_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return jsonify(response)
+    return response
     
 @routes.route("/want_to_read", methods=['GET', 'POST'])
 def want_list():
@@ -232,7 +231,8 @@ def want_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return jsonify(response)
+    print(response)
+    return response
 
 @routes.route("/already_read", methods=['GET', 'POST'])
 def already_list():
@@ -301,7 +301,7 @@ def already_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return jsonify(response)
+    return response
 
 
 # Route for sign up
@@ -454,7 +454,7 @@ def about():
 
 
 # Route for history
-@routes.route("/history", methods=['GET', 'POST'])
+@routes.route("/history", methods=['GET', 'POST', 'DELETE'])
 def history():
     
     # Checking if username is in the current session
@@ -497,10 +497,37 @@ def history():
                 for book in range(len(data['data'])):
                     history[item]['response'].append(data['data'][book])
 
+        print(history)
         return history
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
-    else:
-        print("deleted")
 
+@routes.route('/del_all_history', methods=['DELETE'])
+def rm_all_history():
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
 
+    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    userID = data['data'][0]['id']
+    data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+    prompts = data['data']
+
+    print()
+
+@routes.route('/del_prompt_history', methods=['DELETE'])
+def rm_prompt():
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
+
+    prompt_id = request.form['prompt_id']
+
+    try:
+        client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
+    except JSONDecodeError:
+        try:
+            client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
+        except JSONDecodeError:
+            print('done')
+            return {}, 200
