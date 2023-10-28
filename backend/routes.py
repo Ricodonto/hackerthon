@@ -1,6 +1,5 @@
 import datetime
 import json, re
-from simplejson.errors import JSONDecodeError
 from flask import Blueprint, redirect, render_template, request, url_for, session
 from chatgpt import ai, cleanup, response_organizer
 from openlibrary import *
@@ -29,7 +28,6 @@ def landing():
     # load the landing page if no form is being submitted
     if request.method == 'GET':
         print(2)
-        return render_template("landing_page.html", form=form)
     
     if request.method == 'POST':
         print(3)
@@ -502,32 +500,36 @@ def history():
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
-@routes.route('/del_all_history', methods=['DELETE'])
-def rm_all_history():
-    url = os.environ.get("SUPABASE_URL")
-    key = os.environ.get("SUPABASE_KEY")
-    client = create_client(url, key)
+# @routes.route('/del_all_history', methods=['DELETE'])
+# def rm_all_history():
+#     url = os.environ.get("SUPABASE_URL")
+#     key = os.environ.get("SUPABASE_KEY")
+#     client = create_client(url, key)
 
-    data = client.table("Users").select("id").eq('username',session['username']).execute()
-    userID = data['data'][0]['id']
-    data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
-    prompts = data['data']
+#     data = client.table("Users").select("id").eq('username',session['username']).execute()
+#     userID = data['data'][0]['id']
+#     data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+#     prompts = data['data']
 
-    print()
+#     print()
 
-@routes.route('/del_prompt_history', methods=['DELETE'])
-def rm_prompt():
-    url = os.environ.get("SUPABASE_URL")
-    key = os.environ.get("SUPABASE_KEY")
-    client = create_client(url, key)
+# @routes.route('/del_prompt_history', methods=['GET'])
+# def rm_prompt():
+#     url = os.environ.get("SUPABASE_URL")
+#     key = os.environ.get("SUPABASE_KEY")
+#     client = create_client(url, key)
 
-    prompt_id = request.form['prompt_id']
+#     # prompt_id = request.form['prompt_id']
+#     prompt_id = 13
 
-    try:
-        client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
-    except JSONDecodeError:
-        try:
-            client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
-        except JSONDecodeError:
-            print('done')
-            return {}, 200
+#     data = client.table("Prompts").select('id').eq("id", str(prompt_id)).execute()
+#     data.raise_for_status
+#     # try:
+#     #     client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
+#     # zexcept JSONDecodeError:
+#     #     try:
+#     #         client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
+#     #     except JSONDecodeError:
+#     #         client.table("Prompts").select('id').eq("id", str(prompt_id)).execute()
+#     #         print('done')
+#     #         return {}, 200
