@@ -1,0 +1,28 @@
+.settings-form-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background-color: #6F6F6F;
+    padding: 10px;
+}
+
+.settings-form {
+    margin-bottom: 30px;
+}
+
+.settings-input {
+    padding: 10px;
+    margin-left: 20px;
+    border-radius: 5px;
+    border: 1px solid;
+}
+
+.settings-input-block {
+    margin: 0 10px 20px 10px;
+}
+
+.settings-h2 {
+    text-align: center;
+}
