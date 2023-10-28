@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 import atexit
 
-def ai(prompt):
+def ai(prompt ):
     check = True
     while check == True:
         message = []
@@ -20,7 +20,7 @@ def ai(prompt):
 
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                temperature=0.0,
+                temperature=0.1,
                 messages=[
                     {"role":"system", "content":"do not contain a series of books"},
                     {"role":"system", "content":"only contain the title, isbn, description, author, and ratings for each book and use colons"},
@@ -82,54 +82,54 @@ def cleanup():
         "description": descriptions,
         "images": images
     }
-    record_recommendation(details)
+    # record_recommendation(details)
     return details
 
-def record_recommendation(details):
-    history = []
+# def record_recommendation(details):
+#     history = []
 
-    # Load existing history from the JSON file, if any
-    try:
-        with open("recommendation_history.json", "r") as file:
-            history = json.load(file)
-    except FileNotFoundError:
-        pass
+#     # Load existing history from the JSON file, if any
+#     try:
+#         with open("recommendation_history.json", "r") as file:
+#             history = json.load(file)
+#     except FileNotFoundError:
+#         pass
     
-    form = PromptForm()
-    if form.is_submitted():
-        result = request.form
-        user_prompt = result["prompt"]
+#     form = PromptForm()
+#     if form.is_submitted():
+#         result = request.form
+#         user_prompt = result["prompt"]
     
-    recommendation_entry = {
-        "user_prompt": user_prompt,
-        "recommendation": details}
+#     recommendation_entry = {
+#         "user_prompt": user_prompt,
+#         "recommendation": details}
 
 
-    # Append the new recommendation to the history
-    history.append(recommendation_entry)
+#     # Append the new recommendation to the history
+#     history.append(recommendation_entry)
 
-    # Write the updated history back to the JSON file
-    with open("recommendation_history.json", "w") as file:
-        # Serialize the data to JSON (convert non-serializable lists to regular lists)
-        serialized_history = []
-        for recommendation in history:
-            serialized_recommendation = {
-                "user_prompt": recommendation["user_prompt"],
-                "recommendation": {
-                    "title": recommendation["recommendation"]["title"],
-                    "author": recommendation["recommendation"]["author"],
-                    "isbn": recommendation["recommendation"]["isbn"],
-                    "ratings": recommendation["recommendation"]["ratings"],
-                    "description": recommendation["recommendation"]["description"],
-                    "images": recommendation["recommendation"]["images"]
-                }
-            }
-            serialized_history.append(serialized_recommendation)
-        json.dump(serialized_history, file, indent=4)
+#     # Write the updated history back to the JSON file
+#     with open("recommendation_history.json", "w") as file:
+#         # Serialize the data to JSON (convert non-serializable lists to regular lists)
+#         serialized_history = []
+#         for recommendation in history:
+#             serialized_recommendation = {
+#                 "user_prompt": recommendation["user_prompt"],
+#                 "recommendation": {
+#                     "title": recommendation["recommendation"]["title"],
+#                     "author": recommendation["recommendation"]["author"],
+#                     "isbn": recommendation["recommendation"]["isbn"],
+#                     "ratings": recommendation["recommendation"]["ratings"],
+#                     "description": recommendation["recommendation"]["description"],
+#                     "images": recommendation["recommendation"]["images"]
+#                 }
+#             }
+#             serialized_history.append(serialized_recommendation)
+#         json.dump(serialized_history, file, indent=4)
 
-def clear_history_file():
-    with open("recommendation_history.json", "w") as file:
-        json.dump([], file)
+# def clear_history_file():
+#     with open("recommendation_history.json", "w") as file:
+#         json.dump([], file)
 
 response = {
 "author": [
@@ -184,7 +184,7 @@ def response_organizer(response):
     return books
         
 # Register the cleanup function to run on exit
-atexit.register(clear_history_file)
+# atexit.register(clear_history_file)
 
 if __name__ == '__main__':
     # For testing purposes

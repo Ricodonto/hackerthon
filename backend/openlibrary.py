@@ -11,6 +11,7 @@ def currently_reading(olusr):
     return titles
 
 
+
 def want_to_read(olusr):
     response = requests.get(f"https://openlibrary.org/people/{olusr}/books/want-to-read.json")
     json_response = response.json()
@@ -63,5 +64,9 @@ def olai(titles):
 
 if __name__ == '__main__':
     usr = 'rollingstones1010'
-    titles = want_to_read(usr)
-    print(olai(titles))
+    try:
+        print(currently_reading(usr))
+    except KeyError:
+        print('Enter an existing OpenLibrary Account')
+    # titles = want_to_read(usr)
+    # print(olai(titles))
