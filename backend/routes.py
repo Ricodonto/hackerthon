@@ -1,9 +1,9 @@
 import datetime
 import json, re
+from simplejson.errors import JSONDecodeError
 from flask import Blueprint, redirect, render_template, request, url_for, session
-from forms import PromptForm
-from forms import DeleteForm
 from chatgpt import ai, cleanup, response_organizer
+from openlibrary import *
 from flask import jsonify
 
 import os
@@ -16,6 +16,7 @@ from pathlib import Path
 
 routes = Blueprint(__name__,"route")
 
+#Route for main page
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
 
@@ -25,7 +26,6 @@ def landing():
         return jsonify({"error": "Not Logged In"}), 400
         # username = request.form['username']
     
-    form = PromptForm()
     # load the landing page if no form is being submitted
     if request.method == 'GET':
         print(2)
@@ -51,12 +51,13 @@ def landing():
 
         # get the current user's id and to insert an entry into the prompt table
         print(6)
-        userId = client.table("Users").select("id").eq('username',session['username']).execute()
-        userId = userId['data'][0]['id']
-        data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userId}).execute()
+        userid = client.table("Users").select("id").eq('username',session['username']).execute()
+        userid = userid['data'][0]['id']
+        data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userid}).execute()
         print(data)
         promptid = data['data'][0]['id']
-        
+        session['prompt'] = promptid
+
         # Prompt GPT for recommendations
         print(7)
         response = ai(prompt)
@@ -67,7 +68,7 @@ def landing():
             dict_lines = {'response':[]}
             for line in file:
                 dict_lines['response'].append(line)
-            client.table("Logs").insert({"raw_response": json.dumps(dict_lines), "user_id": userId,'prompt_id': promptid}, ).execute()
+            client.table("Logs").insert({"raw_response": json.dumps(dict_lines), "user_id": userid,'prompt_id': promptid}, ).execute()
 
 
         # Cleaning up the response from GPT
@@ -92,34 +93,216 @@ def landing():
                                               "description":book['description'],
                                               "rating":book['rating'],
                                               "image":book['image']}).execute()
+        print(response)
         return response
-        
-# @routes.route("/", methods=['GET', 'POST'])
-# def landing():
-#     if "username" not in session:
-#         return redirect('/login')
 
-#     form = PromptForm()
-#     if form.is_submitted():
-#         result = request.form
-#         response = {}
-#         # Ensuring that the user sumbitted a filled in response and returning an error message if they havent
-#         if result["prompt"] == "":
-#             return render_template("landing_page.html", form=form, errormsg="Fill in the prompt")
-        
-#         forwd_prompt = str(result["prompt"])
-#         response["prompt"] = forwd_prompt
-#         response = ai(forwd_prompt)
-#         array_response = cleanup()
-#         array_response["prompt"] = result["prompt"]
+@routes.route("/currently_reading", methods=['GET','POST'])
+def current_list():
+    error = False
+    error_message = ""
+    
+    # olusr = request.form['olusr']
+    olusr = request.form['olusr']
+    
+    if len(olusr) <= 0:
+        error_message = "Enter an OpenLibrary Username"
+        return jsonify({"error": error_message}), 400
+    
+    print(2)
+    try:
+        titles = currently_reading(olusr)
+        if len(titles) == 0:
+            error_message = "List is Empty"
+            return jsonify({"error": error_message}), 400
+    except KeyError:
+        print(3)
+        error_message = "Enter an existing OpenLibrary User"
+        return jsonify({"error": error_message}), 400
+    
+    print(4)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+    
+    print(5)
+    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    userid = data['data'][0]['id']
+    data = client.table("Prompts").insert({"prompt_asked": 'Currently Reading List', "userID": userid,}).execute()
+    promptid = data['data'][0]['id']
 
-#         # Deleting the response text file that was generated
+    print(6)
+    olai(titles)
+    
+    print(7)
+    with open('response.txt', 'r') as file:
+        dict_lines = {'response':[]}
+        for line in file:
+            dict_lines['response'].append(line)
+        client.table("Logs").insert({"raw_response": json.dumps(dict_lines), "user_id": userid,'prompt_id': promptid}, ).execute()
 
+    print(8)
+    response = cleanup()
 
-#         # return array_response
-#         return render_template("book_table.html", details=array_response)
+    # Deleting the file created to temporarily hold the response
+    print(9)
+    if os.path.isfile("response.txt"):
+        os.remove("response.txt")
+    response = response_organizer(response)
+    print(response)
+    session['response'] = 'response'
+    
+    # Adding an entry of the usable response to the response table
+    print(10)
+    for book in response:
+        client.table("Responses").insert({"prompt_id": promptid, 
+                                          "book_title": book['title'],
+                                          "isbn":book['isbn'],
+                                          "author":book['author'],
+                                          "description":book['description'],
+                                          "rating":book['rating'],
+                                          "image":book['image']}).execute()
+    print(11)
+    return response
+    
+@routes.route("/want_to_read", methods=['GET', 'POST'])
+def want_list():
+    error = False
+    error_message = ""
+    
+    # olusr = request.form['olusr']
+    olusr = request.form['olusr']
+    
+    print(1)
+    if len(olusr) <= 0:
+        error_message = "Enter an OpenLibrary Username"
+        return jsonify({"error": error_message}), 400
+    
+    print(2)
+    try:
+        titles = want_to_read(olusr)
+        if len(titles) == 0:
+            error_message = "List is Empty"
+            return jsonify({"error": error_message}), 400
+    except KeyError:
+        print(3)
+        error_message = "Enter an existing OpenLibrary User"
+        return jsonify({"error": error_message}), 400
+    
+    print(4)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+    
+    print(5)
+    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    userid = data['data'][0]['id']
+    data = client.table("Prompts").insert({"prompt_asked": 'Want to Read List', "userID": userid,}).execute()
+    promptid = data['data'][0]['id']
 
-#     return render_template("landing_page.html", form=form)
+    print(6)
+    olai(titles)
+    
+    print(7)
+    with open('response.txt', 'r') as file:
+        dict_lines = {'response':[]}
+        for line in file:
+            dict_lines['response'].append(line)
+        client.table("Logs").insert({"raw_response": json.dumps(dict_lines), "user_id": userid,'prompt_id': promptid}, ).execute()
+
+    print(8)
+    response = cleanup()
+
+    # Deleting the file created to temporarily hold the response
+    print(9)
+    if os.path.isfile("response.txt"):
+        os.remove("response.txt")
+    response = response_organizer(response)
+    print(response)
+    session['response'] = 'response'
+    
+    # Adding an entry of the usable response to the response table
+    print(10)
+    for book in response:
+        client.table("Responses").insert({"prompt_id": promptid, 
+                                          "book_title": book['title'],
+                                          "isbn":book['isbn'],
+                                          "author":book['author'],
+                                          "description":book['description'],
+                                          "rating":book['rating'],
+                                          "image":book['image']}).execute()
+    print(11)
+    print(response)
+    return response
+
+@routes.route("/already_read", methods=['GET', 'POST'])
+def already_list():
+    error = False
+    error_message = ""
+    
+    # olusr = request.form['olusr']
+    olusr = request.form['olusr']
+    
+    print(1)
+    if len(olusr) <= 0:
+        error_message = "Enter an OpenLibrary Username"
+        return jsonify({"error": error_message}), 400
+    
+    print(2)
+    try:
+        titles = already_read(olusr)
+        if len(titles) == 0:
+            error_message = "List is Empty"
+            return jsonify({"error": error_message}), 400
+    except KeyError:
+        print(3)
+        error_message = "Enter an existing OpenLibrary User"
+        return jsonify({"error": error_message}), 400
+    
+    print(4)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+    
+    print(5)
+    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    userid = data['data'][0]['id']
+    data = client.table("Prompts").insert({"prompt_asked": 'Already Read List', "userID": userid,}).execute()
+    promptid = data['data'][0]['id']
+
+    print(6)
+    olai(titles)
+    
+    print(7)
+    with open('response.txt', 'r') as file:
+        dict_lines = {'response':[]}
+        for line in file:
+            dict_lines['response'].append(line)
+        client.table("Logs").insert({"raw_response": json.dumps(dict_lines), "user_id": userid,'prompt_id': promptid}, ).execute()
+
+    print(8)
+    response = cleanup()
+
+    # Deleting the file created to temporarily hold the response
+    print(9)
+    if os.path.isfile("response.txt"):
+        os.remove("response.txt")
+    response = response_organizer(response)
+    print(response)
+    session['response'] = 'response'
+    
+    # Adding an entry of the usable response to the response table
+    print(10)
+    for book in response:
+        client.table("Responses").insert({"prompt_id": promptid, 
+                                          "book_title": book['title'],
+                                          "isbn":book['isbn'],
+                                          "author":book['author'],
+                                          "description":book['description'],
+                                          "rating":book['rating'],
+                                          "image":book['image']}).execute()
+    print(11)
+    return response
+
 
 # Route for sign up
 @routes.route("/signup", methods=["GET", "POST"])
@@ -261,6 +444,7 @@ def login():
             # return render_template("login.html", error=error, error_message=error_message)
             return {"error": error_message}, 400
 
+# Route for about
 @routes.route("/about")
 def about():
     if "username" not in session:
@@ -268,7 +452,9 @@ def about():
     return render_template("about.html")
 
 
-@routes.route("/history", methods=['GET', 'POST'])
+
+# Route for history
+@routes.route("/history", methods=['GET', 'POST', 'DELETE'])
 def history():
     
     # Checking if username is in the current session
@@ -311,30 +497,37 @@ def history():
                 for book in range(len(data['data'])):
                     history[item]['response'].append(data['data'][book])
 
+        print(history)
         return history
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
-    else:
-        print("deleted")
 
+@routes.route('/del_all_history', methods=['DELETE'])
+def rm_all_history():
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
 
+    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    userID = data['data'][0]['id']
+    data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+    prompts = data['data']
 
-# @routes.route("/history", methods=['GET', 'POST'])
-# def history():
-#     if "username" not in session:
-#         return redirect('/login')
-#     # Read the recommendation history from the JSON file
-#     try:
-#         with open("recommendation_history.json", "r") as file:
-#             history = json.load(file)
-#     except FileNotFoundError:
-#         history = []
+    print()
 
-#     form = DeleteForm()
-#     if form.is_submitted() and form.validate_on_submit():
-#         with open("recommendation_history.json", "w") as file:
-#             json.dump([], file)  # Just write the empty list, no need to assign the result to a variable
-#         return redirect(url_for("routes.history"))
+@routes.route('/del_prompt_history', methods=['DELETE'])
+def rm_prompt():
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
 
-#     # Render the HTML template and pass the history data to it
-#     return render_template("history.html", history=history, form=form)
+    prompt_id = request.form['prompt_id']
+
+    try:
+        client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
+    except JSONDecodeError:
+        try:
+            client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
+        except JSONDecodeError:
+            print('done')
+            return {}, 200
