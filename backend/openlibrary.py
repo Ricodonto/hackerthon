@@ -29,7 +29,7 @@ def already_read(olusr):
         titles.append(work['work']['title'])
     return titles
 
-titles = ['The Great Gatsby', 'To Kill a Mockingbird', 'Learning Python']
+titles = ['Harry Potter and the Philosopher\'s Stone', 'Harry Potter and the Chamber of Secrets	', 'Learning Python']
 
 def olai(titles):
     check = True
@@ -37,7 +37,7 @@ def olai(titles):
     for title in titles:
         prompt = prompt + title + ', '
     
-    prompt = prompt + 'suggest more books for me to read based on these books'
+    prompt = prompt + 'suggest more books for me to read based all of these books'
     while check == True:
         message = []
         if len(message) == 0:
@@ -46,10 +46,10 @@ def olai(titles):
 
             completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
-                temperature=0.0,
+                temperature=0.8,
                 messages=[
-                    {"role":"system", "content":"do not contain a series of books"},
-                    {"role":"system", "content":"only contain the title, isbn, description, author, and ratings for each book and use colons"},
+                    {"role":"system", "content":"give me the title, isbn, description, author and ratings for each recommendation and use colons"},
+                    # {"role":"system", "content":"only contain the title, isbn, description, author, and ratings for each book and use colons"},
                     {"role": "user", "content": prompt}
                 ]
             )
@@ -62,4 +62,6 @@ def olai(titles):
     file.close()
 
 if __name__ == '__main__':
+    usr = 'rollingstones1010'
+    titles = want_to_read(usr)
     print(olai(titles))
