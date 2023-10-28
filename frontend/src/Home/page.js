@@ -50,6 +50,24 @@ export default function Home() {
                     <button type="submit" className='search-button'><FiSearch /></button>
                 </form>
             </section>
+            {/* Open Library Search Suggestions */}
+            <section className='open-library-search'>
+                <p>Search for books based on your OpenLibrary reading log:</p>
+                <div className='open-library-search-buttons'>
+                    <MyButton 
+                        text={"Currently Reading"}
+                        handleClick={() => console.log("Currently Reading clicked")}
+                    />
+                    <MyButton 
+                        text={"Want to Read"}
+                        handleClick={() => console.log("Want to Read clicked")}
+                    />
+                    <MyButton 
+                        text={"Already Read"}
+                        handleClick={() => console.log("Already Read clicked")}
+                    />
+                </div>
+            </section>
             {/* Search Results */}
             <section className='search-results'>
                 <h2>Search Results</h2>

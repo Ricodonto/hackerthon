@@ -11,6 +11,18 @@
     margin-top: 20px;
 }
 
+.open-library-search {
+    width: 50vw;
+    margin: 0 auto;
+}
+
+.open-library-search-buttons {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
 .search-button, .search-text-field {
     padding: 10px;
 }
