@@ -1,11 +1,19 @@
 import { Outlet, Link } from "react-router-dom";
 import './styles.css'
+import { useNavigate } from "react-router-dom";
 
 export default function Root() {
+    const navigate = useNavigate();
+
     return (
         <body className="root">
             {/* The Nav Bar At The Top */}
-            <div className="navbar">
+            <div 
+                className="navbar"
+                onClick={() => {
+                    navigate('/settings');
+                }}
+            >
                 <UserImage initial={'R'} name={'Roman Njoroge'} />
                 <h1 className="page-title">BookFinder</h1>
             </div>
