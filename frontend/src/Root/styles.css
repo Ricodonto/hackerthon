@@ -38,9 +38,9 @@
     padding-top: 57px;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
-    margin-left: 25vw;
-    margin-right: 25vw;
+    justify-content: space-evenly;
+    width: 50vw;
+    margin: 0 auto;
 }
 
 .linkbox {

@@ -1,14 +1,18 @@
-.content-page {
-    margin-top: 75px;
+.content-page, .settings-page {
+    margin-top: 10px;
     padding: 20px;
     min-height: 100vh;
+}
+
+.settings-page {
+    margin: 0 auto;
+    width: 50vw;
 }
 
 .search-bar {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-top: 20px;
 }
 
 .open-library-search {
@@ -74,8 +78,7 @@ h2 {
 }
 
 .linkbox, .linkbox-delete {
-    display: inline-block;
-    padding: 0px 10px;
+    padding: 0px 20px;
     min-width: 86px;
     min-height: 50px;
     border-radius: 5px;
