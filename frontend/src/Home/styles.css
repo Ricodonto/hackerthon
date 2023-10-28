@@ -1,7 +1,12 @@
-.content-page {
+.content-page, .settings-page {
     margin-top: 10px;
     padding: 20px;
     min-height: 100vh;
+}
+
+.settings-page {
+    margin: 0 auto;
+    width: 50vw;
 }
 
 .search-bar {
