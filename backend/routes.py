@@ -457,11 +457,12 @@ def about():
 @routes.route("/history", methods=['GET', 'POST', 'DELETE'])
 def history():
     
-    # Checking if username is in the current session
-    if 'username' not in list(session.keys()):
-        return redirect('/signup')
-        # return jsonify({"error": "Not Logged In"}), 400
-        # username = request.form['username']    
+    username = str(request.form['username'])
+    # # Checking if username is in the current session
+    # if 'username' not in list(session.keys()):
+    #     return redirect('/signup')
+    #     # return jsonify({"error": "Not Logged In"}), 400
+    #     # username = request.form['username']    
     # # if "username" not in session:
     # #     return redirect('/login')
     # if len(request.form['username']) <= 0:
@@ -478,7 +479,7 @@ def history():
 
         print(3)
         # Getting the user's id and past prompt ids'
-        data = client.table("Users").select("id").eq('username',session['username']).execute()
+        data = client.table("Users").select("id").eq('username',username).execute()
         userID = data['data'][0]['id']
         data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
         history = data['data']
