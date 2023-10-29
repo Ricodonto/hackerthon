@@ -169,7 +169,7 @@ def want_list():
     
     # olusr = request.form['olusr']
     olusr = request.form['olusr']
-    username = request.form['username']
+    username = str(request.form['username'])
     
     print(1)
     if len(olusr) <= 0:
@@ -240,7 +240,7 @@ def already_list():
     
     # olusr = request.form['olusr']
     olusr = request.form['olusr']
-    username = request.form['username']
+    username = str(request.form['username'])
     
     print(1)
     if len(olusr) <= 0:
