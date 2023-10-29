@@ -1,17 +1,14 @@
-import datetime
 import json, re
-from flask import Blueprint, redirect, render_template, request, url_for, session
+from flask import Blueprint, redirect, render_template, request, session
 from chatgpt import ai, cleanup, response_organizer
 from openlibrary import *
 from flask import jsonify
 
 import os
-from supabase_py import create_client, Client
+from supabase import create_client
 import bcrypt
-import jwt
 
 import os
-from pathlib import Path
 
 routes = Blueprint(__name__,"route")
 
