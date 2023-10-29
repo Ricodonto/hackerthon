@@ -1,14 +1,11 @@
 import { url } from "./constants";
 
-export async function getBookRecommendation(prompt) {
+export async function wantToRead(olusr) {
     try {   
-        let username = sessionStorage.getItem('username');
-        console.log(username);
         let formdata = new FormData();
-        formdata.append('username', username);
-        formdata.append('prompt', prompt);
+        formdata.append('olusr', olusr);
         let response = await fetch(
-            `${url}/`,
+            `${url}/want_to_read`,
             {
                 method: 'POST',
                 body: formdata
@@ -24,7 +21,7 @@ export async function getBookRecommendation(prompt) {
                 console.log(10)
                 throw new Error(json['error'])
             } else {
-                throw new Error("Could Not Get Recommendation")
+                throw new Error("Could Not Get Currently Read Books")
             }
         }
 

@@ -1,4 +1,3 @@
-import UserProfile from "./userSession";
 import { url } from "./constants";
 
 export async function signup(username, password) {
@@ -20,7 +19,7 @@ export async function signup(username, password) {
             throw new Error("Could Not Register Account")
         }
 
-        UserProfile.setName(username);
+        sessionStorage.setItem('username', username)
     } catch(err) {
         console.log(err);
         throw new Error("Could Not Register Account");

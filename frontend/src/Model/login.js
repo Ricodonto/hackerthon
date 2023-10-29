@@ -1,5 +1,4 @@
 import { url } from "./constants";
-import UserProfile from "./userSession";
 
 export async function sendLoginDetails(username, password) {
     try {   
@@ -20,7 +19,7 @@ export async function sendLoginDetails(username, password) {
             throw new Error("Could Not Log In")
         }
 
-        UserProfile.setName(username);
+        sessionStorage.setItem('username', username)
     } catch(err) {
         console.log(err);
         throw new Error("Could Not Log In");
