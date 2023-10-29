@@ -123,7 +123,7 @@ def current_list():
     client = create_client(supabase_url=url, supabase_key=key)
     
     print(5)
-    data = client.table("Users").select("id").eq('username',username]).execute()
+    data = client.table("Users").select("id").eq('username', username).execute()
     userid = data['data'][0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Currently Reading List', "userID": userid,}).execute()
     promptid = data['data'][0]['id']
