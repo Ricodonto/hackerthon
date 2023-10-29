@@ -15,16 +15,17 @@ routes = Blueprint(__name__,"route")
 #Route for main page
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
-
-    # Check whether there is a signed in username in session
-    if 'username' not in list(session.keys()):
-        # return redirect('/signup')
-        return jsonify({"error": "Not Logged In"}), 400
-        # username = request.form['username']
+    username: str = request.form['username']
+    # # Check whether there is a signed in username in session
+    # if 'username' not in list(session.keys()):
+    #     # return redirect('/signup')
+    #     return jsonify({"error": "Not Logged In"}), 400
+    #     # username = request.form['username']
     
     # load the landing page if no form is being submitted
     if request.method == 'GET':
         print(2)
+        return {}, 200
     
     if request.method == 'POST':
         print(3)
@@ -46,7 +47,8 @@ def landing():
 
         # get the current user's id and to insert an entry into the prompt table
         print(6)
-        userid = client.table("Users").select("id").eq('username',session['username']).execute()
+        # userid = client.table("Users").select("id").eq('username',session['username']).execute()
+        userid = client.table("Users").select("id").eq('username',username).execute()
         userid = userid['data'][0]['id']
         data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userid}).execute()
         print(data)
@@ -97,6 +99,7 @@ def current_list():
     error_message = ""
     
     # olusr = request.form['olusr']
+    username = str(request.form['username'])
     olusr = request.form['olusr']
     
     if len(olusr) <= 0:
@@ -120,7 +123,7 @@ def current_list():
     client = create_client(supabase_url=url, supabase_key=key)
     
     print(5)
-    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    data = client.table("Users").select("id").eq('username',username]).execute()
     userid = data['data'][0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Currently Reading List', "userID": userid,}).execute()
     promptid = data['data'][0]['id']
@@ -166,6 +169,7 @@ def want_list():
     
     # olusr = request.form['olusr']
     olusr = request.form['olusr']
+    username = str(request.form['username'])
     
     print(1)
     if len(olusr) <= 0:
@@ -189,7 +193,7 @@ def want_list():
     client = create_client(supabase_url=url, supabase_key=key)
     
     print(5)
-    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    data = client.table("Users").select("id").eq('username',username).execute()
     userid = data['data'][0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Want to Read List', "userID": userid,}).execute()
     promptid = data['data'][0]['id']
@@ -236,6 +240,7 @@ def already_list():
     
     # olusr = request.form['olusr']
     olusr = request.form['olusr']
+    username = str(request.form['username'])
     
     print(1)
     if len(olusr) <= 0:
@@ -259,7 +264,7 @@ def already_list():
     client = create_client(supabase_url=url, supabase_key=key)
     
     print(5)
-    data = client.table("Users").select("id").eq('username',session['username']).execute()
+    data = client.table("Users").select("id").eq('username',username).execute()
     userid = data['data'][0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Already Read List', "userID": userid,}).execute()
     promptid = data['data'][0]['id']
