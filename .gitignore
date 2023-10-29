@@ -5,3 +5,4 @@ setUpDatabase.ipynb
 .hackerthon
 backend/__pycache__
 .hackerthon
+backend\venv
