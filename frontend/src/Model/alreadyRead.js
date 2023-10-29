@@ -3,6 +3,8 @@ import { url } from "./constants";
 export async function alreadyReading(olusr) {
     try {   
         let formdata = new FormData();
+        let username = sessionStorage.getItem('username');
+        formdata.append('username', username);
         formdata.append('olusr', olusr);
         let response = await fetch(
             `${url}/already_read`,
