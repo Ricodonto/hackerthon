@@ -1,8 +1,18 @@
 .venv
+.venv2
 .env
 env
 setUpDatabase.ipynb
 .hackerthon
 backend/__pycache__
 .hackerthon
-backend\venv
+
+# Ignoring some more python stuff
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
