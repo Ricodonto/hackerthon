@@ -93,7 +93,7 @@ def landing():
         print(response)
         return response
 
-@routes.route("/currently_reading", methods=['GET','POST'])
+@routes.route("/currently_reading", methods=['POST'])
 def current_list():
     error = False
     error_message = ""
@@ -162,14 +162,14 @@ def current_list():
     print(11)
     return response
     
-@routes.route("/want_to_read", methods=['GET', 'POST'])
+@routes.route("/want_to_read", methods=['POST'])
 def want_list():
     error = False
     error_message = ""
     
     # olusr = request.form['olusr']
-    olusr = str(request.form['olusr'])
-    username = str(request.form['username'])
+    olusr:  str = request.form['olusr']
+    username:  str = request.form['username']
     
     print(1)
     if len(olusr) <= 0:
@@ -233,14 +233,14 @@ def want_list():
     print(response)
     return response
 
-@routes.route("/already_read", methods=['GET', 'POST'])
+@routes.route("/already_read", methods=['POST'])
 def already_list():
     error = False
     error_message = ""
     
     # olusr = request.form['olusr']
-    olusr = str(request.form['olusr'])
-    username = str(request.form['username'])
+    olusr:  str = request.form['olusr']
+    username:  str = request.form['username']
     
     print(1)
     if len(olusr) <= 0:
@@ -457,7 +457,7 @@ def about():
 @routes.route("/history", methods=['GET', 'POST', 'DELETE'])
 def history():
     
-    username = str(request.form['username'])
+    username:  str = request.form['username']
     # # Checking if username is in the current session
     # if 'username' not in list(session.keys()):
     #     return redirect('/signup')
