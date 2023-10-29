@@ -25,6 +25,7 @@ def landing():
     # load the landing page if no form is being submitted
     if request.method == 'GET':
         print(2)
+        return {}, 200
     
     if request.method == 'POST':
         print(3)
