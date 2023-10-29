@@ -4,5 +4,5 @@
 env
 setUpDatabase.ipynb
 .hackerthon
-backend/__pycache__
+backend/__pycache__/
 .hackerthon
