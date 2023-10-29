@@ -100,7 +100,7 @@ def current_list():
     
     # olusr = request.form['olusr']
     username = str(request.form['username'])
-    olusr = request.form['olusr']
+    olusr = str(request.form['olusr'])
     
     if len(olusr) <= 0:
         error_message = "Enter an OpenLibrary Username"
@@ -168,7 +168,7 @@ def want_list():
     error_message = ""
     
     # olusr = request.form['olusr']
-    olusr = request.form['olusr']
+    olusr = str(request.form['olusr'])
     username = str(request.form['username'])
     
     print(1)
@@ -239,7 +239,7 @@ def already_list():
     error_message = ""
     
     # olusr = request.form['olusr']
-    olusr = request.form['olusr']
+    olusr = str(request.form['olusr'])
     username = str(request.form['username'])
     
     print(1)
