@@ -3,12 +3,9 @@ import re
 from dotenv import load_dotenv
 from flask import request
 load_dotenv('.env')
-from forms import PromptForm
 
 import openai
-import json
 from datetime import datetime
-import atexit
 
 def ai(prompt ):
     check = True
