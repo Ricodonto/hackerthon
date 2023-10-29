@@ -15,12 +15,12 @@ routes = Blueprint(__name__,"route")
 #Route for main page
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
-
-    # Check whether there is a signed in username in session
-    if 'username' not in list(session.keys()):
-        # return redirect('/signup')
-        return jsonify({"error": "Not Logged In"}), 400
-        # username = request.form['username']
+    username: str = request.form['username']
+    # # Check whether there is a signed in username in session
+    # if 'username' not in list(session.keys()):
+    #     # return redirect('/signup')
+    #     return jsonify({"error": "Not Logged In"}), 400
+    #     # username = request.form['username']
     
     # load the landing page if no form is being submitted
     if request.method == 'GET':
@@ -47,7 +47,8 @@ def landing():
 
         # get the current user's id and to insert an entry into the prompt table
         print(6)
-        userid = client.table("Users").select("id").eq('username',session['username']).execute()
+        # userid = client.table("Users").select("id").eq('username',session['username']).execute()
+        userid = client.table("Users").select("id").eq('username',username).execute()
         userid = userid['data'][0]['id']
         data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userid}).execute()
         print(data)
