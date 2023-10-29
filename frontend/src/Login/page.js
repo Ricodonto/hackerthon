@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import './styles.css';
 import { sendLoginDetails } from "../Model/login";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    let navigate = useNavigate();
 
     async function handleSubmit(event) {
         event.preventDefault();
@@ -15,6 +17,7 @@ export default function Login() {
             console.log(1)
             await sendLoginDetails(username, password);
             console.log(2)
+            navigate('/')
         } catch (err) {
             console.log(3)
             console.log(err)
@@ -26,7 +29,7 @@ export default function Login() {
 
 
     return (
-        <div>
+        <div className="content-page">
             <h2>Sign into your Bookfinder account</h2>
             <form className="login-form" onSubmit={handleSubmit}>
                 <div className="email">
