@@ -11,6 +11,7 @@ click==8.1.7
 dataclasses==0.6
 deprecation==2.1.0
 Flask==3.0.0
+Flask-Cors==4.0.0
 frozenlist==1.4.0
 gotrue==0.2.0
 gunicorn==21.2.0
