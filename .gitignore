@@ -4,5 +4,15 @@
 env
 setUpDatabase.ipynb
 .hackerthon
-backend/__pycache__/
+backend/__pycache__
 .hackerthon
+
+# Ignoring some more python stuff
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
