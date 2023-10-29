@@ -5,7 +5,7 @@ from openlibrary import *
 from flask import jsonify
 
 import os
-from supabase import create_client
+from supabase_py import create_client
 import bcrypt
 
 import os
