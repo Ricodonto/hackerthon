@@ -3,16 +3,18 @@ import './styles.css';
 import { useState } from 'react';
 import { getBookRecommendation } from '../Model/getBookRecommendation';
 import { currentReading } from '../Model/currentReading';
-import { Oval } from 'react-loader-spinner'
 import Dialog from '@mui/material/Dialog';
 import { DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { alreadyReading } from '../Model/alreadyRead';
 import { wantToRead } from '../Model/wantToRead';
+import ErrorWidget from '../Components/errorWidget';
+import LoadingScreen from '../Components/loadingScreen';
 
 export default function Home() {
     const [searchResults, setSearchResults] = useState([]);
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
+    const [loadingMessage, setLoadingMessage] = useState("");
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("")
     const [openCurrentReadingDialog, setOpenCurrentReading] = useState(false);
@@ -31,12 +33,14 @@ export default function Home() {
         console.log("Clicked")
         try {
             setLoading(true);
+            setLoadingMessage("Book Recommendations Are Loading")
             let response = await getBookRecommendation(prompt);
             setLoading(false);
             setSearchResults(response)
         } catch (err) {
             console.log("OH SHIT!")
             setLoading(false);
+            setLoadingMessage("");
             setError(true);
             console.log(`The error is ${err}`)
             setErrorMessage(err.message)
@@ -48,12 +52,14 @@ export default function Home() {
         try {
             setOpenCurrentReading(false)
             setLoading(true);
+            setLoadingMessage("Getting Currently Read Books")
             let response = await currentReading(olan);
             setLoading(false);
             setSearchResults(response)
         } catch (err) {
             console.log("OH SHIT!")
             setLoading(false);
+            setLoadingMessage("");
             setError(true);
             console.log(`The error is ${err}`)
             setErrorMessage(err.message)
@@ -65,12 +71,14 @@ export default function Home() {
         try {
             setOpenAlreadyReading(false)
             setLoading(true);
+            setLoadingMessage("Getting Books That Your Already Reading");
             let response = await alreadyReading(olan);
             setLoading(false);
             setSearchResults(response)
         } catch (err) {
             console.log("OH SHIT!")
             setLoading(false);
+            setLoadingMessage("")
             setError(true);
             console.log(`The error is ${err}`)
             setErrorMessage(err.message)
@@ -82,12 +90,14 @@ export default function Home() {
         try {
             setWantToRead(false)
             setLoading(true);
+            setLoadingMessage("Getting Books That You Want To Read");
             let response = await wantToRead(olan);
             setLoading(false);
             setSearchResults(response)
         } catch (err) {
             console.log("OH SHIT!")
             setLoading(false);
+            setLoadingMessage("");
             setError(true);
             console.log(`The error is ${err}`)
             setErrorMessage(err.message)
@@ -95,31 +105,9 @@ export default function Home() {
     }
 
     if (loading === true) {
-        return (
-            <div>
-                <Oval
-                    height={200}
-                    width={200}
-                    color="#4fa94d"
-                    wrapperStyle={{}}
-                    wrapperClass=""
-                    visible={true}
-                    ariaLabel='oval-loading'
-                    secondaryColor="#4fa94d"
-                    strokeWidth={2}
-                    strokeWidthSecondary={2}
-
-                />
-                <p>Books Are Loading</p>
-            </div>
-        );
+        return <ErrorWidget message={errorMessage} />;
     } else if (error === true) {
-        return (
-            <div>
-                <h2>Error Occured</h2>
-                <p>{errorMessage}</p>
-            </div>
-        );
+        return <LoadingScreen message={loadingMessage} />;
     } else {
         return (
             <div className='content-page'>
@@ -217,7 +205,28 @@ export default function Home() {
                 </Dialog>
                 {/* Search Results */}
                 <section className='search-results'>
-                    <h2>Search Results</h2>
+                    <div className='search-results-header'>
+                        <h2>Search Results</h2>
+                        <div className='search-results-share'>
+                            <MyButton 
+                                text={'Share'}
+                                handleClick={() => console.log("Share clicked")}
+                            />
+                            <div className='suggestions-row'>
+                                <p>Were the suggestions helpful?</p>
+                                <MyButton
+                                    text={"Yes"}
+                                    small={true}
+                                    handleClick={() => console.log("Yes")}
+                                />
+                                <MyButton
+                                    text={"No"}
+                                    small={true}
+                                    handleClick={() => console.log("No")}
+                                />
+                            </div>
+                        </div>
+                    </div>
 
                     {searchResults.map((val, index) => {
                         return <SearchResult
@@ -249,7 +258,6 @@ function SearchResult(props) {
                     <p style={{ flex: 2 }}>{props.author}</p>
                     <p style={{ flex: 1 }}>{props.rating}</p>
                     <p style={{ flex: 3 }}>{props.description}</p>
-                    <MyButton text={'Summary'} handleClick={props.handleShowSummary} />
                     <MyButton text={'More Info'}
                         handleClick={() => {
                             window.open(props.moreInfoLink, "_blank")
@@ -281,6 +289,10 @@ export function MyButton(props) {
     if (props.delete === true) {
         return (
             <button className='linkbox-delete' onClick={props.handleClick}>{props.text}</button>
+        );
+    } else if (props.small === true) {
+        return (
+            <button className='linkbox-small' onClick={props.handleClick}>{props.text}</button>
         );
     }
     return (

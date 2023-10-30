@@ -77,6 +77,12 @@ h2 {
     color: red;
 }
 
+.linkbox-small {
+    border-radius: 5px;
+    border: 1px solid;
+    margin: 0 10px;
+}
+
 .linkbox, .linkbox-delete {
     padding: 0px 20px;
     min-width: 86px;
@@ -91,6 +97,23 @@ h2 {
 
 p {
     font-family: 'Inter', sans-serif;
+}
+
+.search-results-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.search-results-share {
+    display: flex;
+    flex-direction: row;
+}
+
+.suggestions-row {
+    display: flex;
+    flex-direction: row;
+    margin-left: 20px;
 }
 
 .search-text-field {

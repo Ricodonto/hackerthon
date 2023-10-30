@@ -2,18 +2,17 @@ import { useState } from 'react';
 import './styles.css';
 import { AiFillDelete } from 'react-icons/ai';
 import { MyButton } from '../Home/page';
+import { useLoaderData } from 'react-router-dom';
+import ErrorWidget from '../Components/errorWidget';
+import LoadingScreen from '../Components/loadingScreen';
 
 export default function History() {
-    const [histories, setHistories] = useState([
-        {
-            description: "Harry Potter and the Philosopher's Stone is a fantasy novel written by British author J. K. Rowling",
-            title: "Harry Potter and the Sorcerer's Stone",
-            author: "J. K. Rowling",
-            rating: 4.6,
-            imageUrl: "https://covers.openlibrary.org/b/id/13741661-M.jpg",
-            moreInfoLink: "https://openlibrary.org/works/OL34924410W/Harry_Potter_And_The_Sorcer%27s_Stone?edition=key%3A/books/OL7893441M"
-        }
-    ]);
+    const originalHistories = useLoaderData();
+    const [histories, setHistories] = useState(originalHistories);
+    const [error, setError] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loadingMessage, setLoadingMessage] = useState("");
 
     function handleDelete(i) {
         let newHistories = histories.slice();
@@ -25,6 +24,11 @@ export default function History() {
         setHistories([]);
     }
 
+    if (loading === true) {
+        return <ErrorWidget message={errorMessage} />;
+    } else if (error === true) {
+        return <LoadingScreen message={loadingMessage} />;
+    }
     return (
         <div className='content-page'>
             <div className='history'>
