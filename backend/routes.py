@@ -8,7 +8,7 @@ import os
 from supabase_py import create_client
 import bcrypt
 
-import os
+from simplejson.errors import JSONDecodeError
 
 routes = Blueprint(__name__,"route")
 
@@ -454,10 +454,12 @@ def about():
 
 
 # Route for history
-@routes.route("/history", methods=['GET', 'POST', 'DELETE'])
-def history():
-    
-    username:  str = request.form['username']
+@routes.route("/history", methods=['GET', 'POST'])
+def history(usr=''):
+    if len(usr) > 0:
+        username = usr
+    else:
+        username:  str = request.form['username']
     # # Checking if username is in the current session
     # if 'username' not in list(session.keys()):
     #     return redirect('/signup')
@@ -488,7 +490,6 @@ def history():
         print(history)
         for item in range(len(history)):
             data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
-
             # Checking whether past prompt id had an empty prompt
             if len(data['data']) == 0:
                 pass
@@ -498,41 +499,81 @@ def history():
                 for book in range(len(data['data'])):
                     history[item]['response'].append(data['data'][book])
 
+        print(5)
         print(history)
+        print(6)
         return history
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
-# @routes.route('/del_all_history', methods=['DELETE'])
-# def rm_all_history():
-#     url = os.environ.get("SUPABASE_URL")
-#     key = os.environ.get("SUPABASE_KEY")
-#     client = create_client(url, key)
+@routes.route('/del_all_history', methods=['DELETE'])
+def rm_all_history():
+    error = False
+    error_message = ""
+    
+    username:  str = request.form['username']
 
-#     data = client.table("Users").select("id").eq('username',session['username']).execute()
-#     userID = data['data'][0]['id']
-#     data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
-#     prompts = data['data']
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
 
-#     print()
+    data = client.table("Users").select("id").eq('username',username).execute()
+    user_id = data['data'][0]['id']
+    print(user_id)
+    data = client.table('Prompts').select('id').eq('userID', str(user_id)).execute()
+    prompts = []
+    for prompt in data['data']:
+        prompts.append(str(prompt['id']))
+    
 
-# @routes.route('/del_prompt_history', methods=['GET'])
-# def rm_prompt():
-#     url = os.environ.get("SUPABASE_URL")
-#     key = os.environ.get("SUPABASE_KEY")
-#     client = create_client(url, key)
+    print(prompts)
 
-#     # prompt_id = request.form['prompt_id']
-#     prompt_id = 13
+    try:
+        data = client.table("Feedback").delete().in_("prompt_id", prompts).execute()
+    except JSONDecodeError:
+        try:
+            client.table("Logs").delete().in_("prompt_id", prompts).execute()
+        except JSONDecodeError:
+            try:
+                client.table("Responses").delete().in_("prompt_id", prompts).execute()
+            except JSONDecodeError:
+                try:
+                    client.table("Prompts").delete().in_("id", prompts).execute()
+                except JSONDecodeError:
+                    #For testing purposes
+                    print('done')
+                    request.method = 'GET'                    
+                    return history(username)
+    error = True
+    error_message = "Something Went Wrong"
+    # return render_template("login.html", error=error, error_message=error_message)
+    return jsonify({"error": error_message}), 400
 
-#     data = client.table("Prompts").select('id').eq("id", str(prompt_id)).execute()
-#     data.raise_for_status
-#     # try:
-#     #     client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
-#     # zexcept JSONDecodeError:
-#     #     try:
-#     #         client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
-#     #     except JSONDecodeError:
-#     #         client.table("Prompts").select('id').eq("id", str(prompt_id)).execute()
-#     #         print('done')
-#     #         return {}, 200
+
+@routes.route('/del_prompt_history', methods=['DELETE'])
+def rm_prompt():
+    prompt_id: str = request.form['prompt_id']
+    username:  str = request.form['username']
+    
+    print(prompt_id)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
+
+
+    try:
+        client.table("Feedback").delete().eq("prompt_id", str(prompt_id)).execute()
+    except JSONDecodeError:
+        try:
+            client.table("Logs").delete().eq("prompt_id", str(prompt_id)).execute()
+        except JSONDecodeError:
+            try:
+                client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
+            except JSONDecodeError:
+                try:
+                    client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
+                except JSONDecodeError:
+                    # For testing purposes
+                    request.method = 'GET'
+                    return history(username)
+
