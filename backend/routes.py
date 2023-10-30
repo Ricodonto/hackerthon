@@ -571,7 +571,7 @@ def rm_prompt():
     print(7)
     request.method = 'GET'
     return history(username)
-    
+
 
 @routes.route('/profile/changeusr', methods=['POST'])
 def change_username():
@@ -666,6 +666,37 @@ def change_password():
 
         return {"error": error_message}, 400
 
+@routes.route('/delete_usr', methods=['DELETE'])
+def delete_usr():
+    error = False
+    error_message = ""
+    
+    username:  str = request.form['username']
+
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
+
+    data = client.table("Users").select("id").eq('username',username).execute()
+    user_id = data.data[0]['id']
+    print(user_id)
+    data = client.table('Prompts').select('id').eq('userID', str(user_id)).execute()
+    prompts = []
+    for prompt in data.data:
+        prompts.append(str(prompt['id']))
+    
+
+    print(prompts)
+
+    client.table("Feedback").delete().in_("prompt_id", prompts).execute()
+    client.table("Logs").delete().in_("prompt_id", prompts).execute()
+    client.table("Responses").delete().in_("prompt_id", prompts).execute()
+    client.table("Prompts").delete().in_("id", prompts).execute()
+    client.table("Users").delete().eq("id", str(user_id)).execute()
+                    #For testing purposes
+    print('done')
+    return [], 200
+
 @routes.route('/feedback/good', methods=['POST'])
 def good_feedback():
     prompt_id: str = request.form['prompt_id']
@@ -713,29 +744,34 @@ def bad_feedback():
     return data.data, 200
 
 @routes.route('/emailing', methods=['POST'])
-def emailing(responses):
+def emailing():
     # receiver is an email
+    print(1)
     recepient: str = request.form['reciever'] # This is  a string, if many they are separated by commas
     prompt_asked: str = request.form['prompt_asked'] # is a string
     responses: str = request.form['responses'] # is a list
     username: str = request.form['username']
     
+    print(2)
     titles = []
     for book in responses:
         title_author = book['title'] + ' by ' + book['author']
         titles.append(title_author)
 
+    print(3)
     book_titles = '<br>'.join(titles)
     
     EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
     EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
 
+    print(4)
     msg = EmailMessage()
     msg['Subject'] = 'Checkout Bronx'
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = str(recepient)
     
+    print(5)
     msg.set_content(f'Email by {username} from Bookfinder...')
     msg.add_alternative(f"""\
 <!DOCTYPE html>
@@ -754,11 +790,13 @@ def emailing(responses):
 </html>
 """, subtype='html')
     
+    print(6)
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
         smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
 
         smtp.send_message(msg)
 
+    print(7)
     return [], 200
 
 
