@@ -33,11 +33,13 @@ def already_read(olusr):
 titles = ['Harry Potter and the Philosopher\'s Stone', 'Harry Potter and the Chamber of Secrets	', 'Learning Python']
 
 def olai(titles):
+    print(1)
     check = True
     prompt = ''
     for title in titles:
         prompt = prompt + title + ', '
     
+    print(2)
     prompt = prompt + 'suggest more books for me to read based all of these books'
     while check == True:
         message = []
@@ -58,9 +60,11 @@ def olai(titles):
             message.append(completion.choices[0].message.content)
     
     # Generating a file that contains GPT-3.5 Turbo's formatted results labeled response.txt
+    print(3)
     file = open("response.txt", "w")
     file.write(message[0])
     file.close()
+    print(4)
 
 if __name__ == '__main__':
     usr = 'rollingstones1010'

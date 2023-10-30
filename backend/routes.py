@@ -199,6 +199,7 @@ def want_list():
     promptid = data['data'][0]['id']
 
     print(6)
+    print(titles)
     olai(titles)
     
     print(7)
@@ -506,6 +507,7 @@ def history(usr=''):
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
+# Route to delete all of the user's history
 @routes.route('/del_all_history', methods=['DELETE'])
 def rm_all_history():
     error = False
@@ -549,7 +551,7 @@ def rm_all_history():
     # return render_template("login.html", error=error, error_message=error_message)
     return jsonify({"error": error_message}), 400
 
-
+# Route for deleting a specific prompt
 @routes.route('/del_prompt_history', methods=['DELETE'])
 def rm_prompt():
     prompt_id: str = request.form['prompt_id']
