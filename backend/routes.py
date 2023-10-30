@@ -1,4 +1,4 @@
-import json, re
+import json, re, smtplib, os, imghdr
 from flask import Blueprint, redirect, render_template, request, session
 from chatgpt import ai, cleanup, response_organizer
 from openlibrary import *
@@ -9,6 +9,10 @@ from supabase import create_client
 import bcrypt
 
 from simplejson.errors import JSONDecodeError
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.message import EmailMessage
 
 routes = Blueprint(__name__,"route")
 
@@ -478,36 +482,35 @@ def history(usr=''):
     # username = request.form['username']
     
     # Checking if the user wishes to view their history
-    if request.method == 'GET':
-        print(2)
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
-        client = create_client(supabase_url=url, supabase_key=key)
+    print(2)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
 
-        print(3)
-        # Getting the user's id and past prompt ids'
-        data = client.table("Users").select("id").eq('username',username).execute()
-        userID = data.data[0]['id']
-        data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
-        history = data.data
+    print(3)
+    # Getting the user's id and past prompt ids'
+    data = client.table("Users").select("id").eq('username',username).execute()
+    userID = data.data[0]['id']
+    data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+    history = data.data
         
-        print(4)
-        print(history)
-        for item in range(len(history)):
-            data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
-            # Checking whether past prompt id had an empty prompt
-            if len(data.data) == 0:
-                pass
-            else:
-                # Appending the response data to their respoective prompt id
-                history[item]['response'] = []
-                for book in range(len(data.data)):
-                    history[item]['response'].append(data.data[book])
+    print(4)
+    print(history)
+    for item in range(len(history)):
+        data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
+        # Checking whether past prompt id had an empty prompt
+        if len(data.data) == 0:
+            pass
+        else:
+            # Appending the response data to their respoective prompt id
+            history[item]['response'] = []
+            for book in range(len(data.data)):
+                history[item]['response'].append(data.data[book])
 
-        print(5)
-        print(history)
-        print(6)
-        return history
+    print(5)
+    print(history)
+    print(6)
+    return history
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
@@ -570,7 +573,7 @@ def rm_prompt():
     print(7)
     request.method = 'GET'
     return history(username)
-    
+
 
 @routes.route('/profile/changeusr', methods=['POST'])
 def change_username():
@@ -665,6 +668,37 @@ def change_password():
 
         return {"error": error_message}, 400
 
+@routes.route('/delete_usr', methods=['DELETE'])
+def delete_usr():
+    error = False
+    error_message = ""
+    
+    username:  str = request.form['username']
+
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
+
+    data = client.table("Users").select("id").eq('username',username).execute()
+    user_id = data.data[0]['id']
+    print(user_id)
+    data = client.table('Prompts').select('id').eq('userID', str(user_id)).execute()
+    prompts = []
+    for prompt in data.data:
+        prompts.append(str(prompt['id']))
+    
+
+    print(prompts)
+
+    client.table("Feedback").delete().in_("prompt_id", prompts).execute()
+    client.table("Logs").delete().in_("prompt_id", prompts).execute()
+    client.table("Responses").delete().in_("prompt_id", prompts).execute()
+    client.table("Prompts").delete().in_("id", prompts).execute()
+    client.table("Users").delete().eq("id", str(user_id)).execute()
+                    #For testing purposes
+    print('done')
+    return [], 200
+
 @routes.route('/feedback/good', methods=['POST'])
 def good_feedback():
     prompt_id: str = request.form['prompt_id']
@@ -715,21 +749,71 @@ def bad_feedback():
 def emailing():
     error = False
     error_message = ""
-
-    # receiver is an email
-    receiver: str = request.form['reciever']
-    prompt_asked: str = request.form['prompt_asked'] # is a string
-    responses: str = request.form['responses'] # is a list
     
-    if len(receiver) == 0:
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+    
+    try:
+        # Receiver is an email
+        receiver = request.form['receiver']
+        prompt_asked = request.form['prompt_asked']
+        
+        # Fetch the prompt_id from the "Prompts" table
+        prompt_id = None
+        prompt_data = client.table("Prompts").select("id").eq("prompt_asked", prompt_asked).execute()
+        if prompt_data.data:
+            prompt_id = prompt_data.data[0]['id']
+        
+        # Fetch recommendations based on the prompt_id
+        recommendations = []
+        if prompt_id:
+            response_data = client.table("Responses").select("book_title").eq("prompt_id", prompt_id).execute()
+            recommendations = [response.get('book_title') for response in response_data.data]
+        
+        if len(receiver) == 0:
+            raise Exception("Please enter your email")
+        
+        EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS")
+        EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+        
+        # Create an email message
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_ADDRESS
+        msg['To'] = receiver
+        msg['Subject'] = "Your Prompt and Recommendations"
+    
+        # Add the prompt to the email body
+        prompt_text = f"Prompt: {prompt_asked}\n"
+        msg.attach(MIMEText(prompt_text, 'plain'))
+    
+        # Add recommendations to the email body
+        recommendations_text = "Recommendations:\n"
+        for i, response in enumerate(recommendations, start=1):
+            recommendations_text += f"{i}. {response.strip()}\n"
+        msg.attach(MIMEText(recommendations_text, 'plain'))
+    
+        # Connect to the SMTP server (in this case, Gmail)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        
+        # Login using your email address and app password
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+    
+        # Send the email
+        server.sendmail(EMAIL_ADDRESS, receiver, msg.as_string())
+    
+        # Close the SMTP connection
+        server.quit()
+    
+    except Exception as e:
         error = True
-        error_message = "enter an email"
+        error_message = str(e)
 
-        return {'error': error_message}, 400
-    
+    if error:
+        return {"error": error_message}, 400
+    else:
+        return {"message": "Email sent successfully"}, 200
 
-
-    return [], 200
-    print()
 
 

@@ -19,6 +19,7 @@ import SignUp from './SignUp/page';
 import ErrorPage from './Error/page';
 import Root from './Root/page';
 import Settings from './Settings/page';
+import { getHistory } from './Model/getHistory';
 
 // Defining routes
 const router = createBrowserRouter([
@@ -38,6 +39,9 @@ const router = createBrowserRouter([
       },
       {
         path: "history",
+        loader: async() => {
+          return await getHistory();
+        },
         element: <History />
       },
       {
