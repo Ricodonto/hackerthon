@@ -1,12 +1,10 @@
-.gitignore - to hold sensitive information
+.gitignore - to prevent sensitive data from being pushed to the repository
 
 .github/worflows - contains defined GitHub Action Workflows
 
-/books.csv - dataset of the book details: title, author,ISBN, ISBN-13, language-code, average rating,number of pages,date of publication, publisher
+/books.csv - dataset of the book details: title, author,ISBN, ISBN-13, language-code, average rating,number of pages,date of publication, publisher from goodreads
 
-/new_books.csv - Modified version of books.csv used to retrieve only a specific data from it. Which are the title, author and ISBN.
-
-recommendation_history.json - Storing the books recommended for testing purposes
+/new_books.csv - Modified version of books.csv used to retrieve only the relevant data from it.
 
 /requirements.txt - Used to specify  the exact versions of python packages for our project.
 
@@ -17,9 +15,12 @@ recommendation_history.json - Storing the books recommended for testing purposes
 /tempCodeRunnerFile.python - Sets up a Flask web application with a single route(“/”). When you run the the script it starts a local web server that accesses the homepage.
 Generative AI would generate the list of recommended books and their details based on the user’s prompt
 
-/test/chatgpt.py - It takes the user's prompt and queries the openai api (under the ai() function) it then writes a temporary file called "response.txt" which gives out its messages.
+/backend/chatgpt.py - It takes the user's prompt and queries the openai api (under the ai() function) it then writes a temporary file called "response.txt" which gives out its messages.
 The function cleanup then loads "response.txt" and searches for particular data such as the book title, isbn, rating etc, and returns an easier to work with piece of data"\
 This data will be used in the routes.py folder
+
+- It also has the cleanup function that parses through response.txt to format it into an array containing the relevant infromation from the suggestions
+- 
 
 /test/routes.py - this is the file that holds the routes of our Service page, where flask would create a web api that would be hosted by a webservice provider
 

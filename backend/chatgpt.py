@@ -82,52 +82,6 @@ def cleanup():
     # record_recommendation(details)
     return details
 
-# def record_recommendation(details):
-#     history = []
-
-#     # Load existing history from the JSON file, if any
-#     try:
-#         with open("recommendation_history.json", "r") as file:
-#             history = json.load(file)
-#     except FileNotFoundError:
-#         pass
-    
-#     form = PromptForm()
-#     if form.is_submitted():
-#         result = request.form
-#         user_prompt = result["prompt"]
-    
-#     recommendation_entry = {
-#         "user_prompt": user_prompt,
-#         "recommendation": details}
-
-
-#     # Append the new recommendation to the history
-#     history.append(recommendation_entry)
-
-#     # Write the updated history back to the JSON file
-#     with open("recommendation_history.json", "w") as file:
-#         # Serialize the data to JSON (convert non-serializable lists to regular lists)
-#         serialized_history = []
-#         for recommendation in history:
-#             serialized_recommendation = {
-#                 "user_prompt": recommendation["user_prompt"],
-#                 "recommendation": {
-#                     "title": recommendation["recommendation"]["title"],
-#                     "author": recommendation["recommendation"]["author"],
-#                     "isbn": recommendation["recommendation"]["isbn"],
-#                     "ratings": recommendation["recommendation"]["ratings"],
-#                     "description": recommendation["recommendation"]["description"],
-#                     "images": recommendation["recommendation"]["images"]
-#                 }
-#             }
-#             serialized_history.append(serialized_recommendation)
-#         json.dump(serialized_history, file, indent=4)
-
-# def clear_history_file():
-#     with open("recommendation_history.json", "w") as file:
-#         json.dump([], file)
-
 
 def response_organizer(response):
     books = []
@@ -142,12 +96,12 @@ def response_organizer(response):
         books.append(book)
     return books
         
-# Register the cleanup function to run on exit
-# atexit.register(clear_history_file)
+
 
 if __name__ == '__main__':
     # For testing purposes
     # ai("cooking books")
     # print(cleanup())
-    print(response_organizer(response))
+    # print(response_organizer(response))
+    cleanup()
 
