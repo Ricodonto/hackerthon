@@ -87,7 +87,8 @@ def landing():
                                               "rating":book['rating'],
                                               "image":book['image']}).execute()
         print(response)
-        return response
+        output = {'prompt_id': promptid, 'prompt_asked':prompt, 'response':response}
+        return output
     else:
         print(2)
         return {}, 200
@@ -159,7 +160,9 @@ def current_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return response
+
+    output = {'prompt_id': promptid, 'prompt_asked':'Already Read List', 'response':response}
+    return output
     
 @routes.route("/want_to_read", methods=['POST'])
 def want_list():
@@ -230,8 +233,9 @@ def want_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    print(response)
-    return response
+
+    output = {'prompt_id': promptid, 'prompt_asked':'Want to Read List', 'response':response}
+    return output
 
 @routes.route("/already_read", methods=['POST'])
 def already_list():
@@ -301,7 +305,8 @@ def already_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return response
+    output = {'prompt_id': promptid, 'prompt_asked':'Already Read List', 'response':response}
+    return output
 
 
 # Route for sign up
@@ -662,13 +667,49 @@ def change_password():
 
 @routes.route('/feedback/good', methods=['POST'])
 def good_feedback():
+    prompt_id: str = request.form['prompt_id']
+    username: str = request.form['username']
+
+    print(1)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+
+    print(2)
+    data = client.table("Users").select('id').eq('username', str(username)).execute()
+    user_id = data.data[0]['id']
+
+    print(3)
+    data = client.table("Logs").select('id').eq('prompt_id', str(prompt_id)).execute()
+    log_id = data.data[0]['id']
+
+    print(4)
+    data = client.table("Feedback").insert({"prompt_id": str(prompt_id), "user_id": str(user_id), 'log_id':str(log_id), 'opinion': 'Yes'}).execute()
     
-    print()
+    return data.data, 200
 
 @routes.route('/feedback/bad', methods=['POST'])
 def bad_feedback():
+    prompt_id: str = request.form['prompt_id']
+    username: str = request.form['username']
+
+    print(1)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+
+    print(2)
+    data = client.table("Users").select('id').eq('username', str(username)).execute()
+    user_id = data.data[0]['id']
+
+    print(3)
+    data = client.table("Logs").select('id').eq('prompt_id', str(prompt_id)).execute()
+    log_id = data.data[0]['id']
+
+    print(4)
+    data = client.table("Feedback").insert({"prompt_id": str(prompt_id), "user_id": str(user_id), 'log_id':str(log_id), 'opinion': 'No'}).execute()
     
-    print()
+    return data.data, 200
 
 @routes.route('/emailing', methods=['POST'])
 def emailing():
