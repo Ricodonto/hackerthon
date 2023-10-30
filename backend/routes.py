@@ -713,12 +713,21 @@ def bad_feedback():
 
 @routes.route('/emailing', methods=['POST'])
 def emailing():
+    error = False
+    error_message = ""
+
     # receiver is an email
     receiver: str = request.form['reciever']
     prompt_asked: str = request.form['prompt_asked'] # is a string
     responses: str = request.form['responses'] # is a list
     
+    if len(receiver) == 0:
+        error = True
+        error_message = "enter an email"
+
+        return {'error': error_message}, 400
     
+
 
     return [], 200
     print()
