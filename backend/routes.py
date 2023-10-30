@@ -1,4 +1,4 @@
-import json, re
+import json, re, smtplib, os, imghdr
 from flask import Blueprint, redirect, render_template, request, session
 from chatgpt import ai, cleanup, response_organizer
 from openlibrary import *
@@ -9,6 +9,8 @@ from supabase import create_client
 import bcrypt
 
 from simplejson.errors import JSONDecodeError
+
+from email.message import EmailMessage
 
 routes = Blueprint(__name__,"route")
 
@@ -478,36 +480,35 @@ def history(usr=''):
     # username = request.form['username']
     
     # Checking if the user wishes to view their history
-    if request.method == 'GET':
-        print(2)
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
-        client = create_client(supabase_url=url, supabase_key=key)
+    print(2)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
 
-        print(3)
-        # Getting the user's id and past prompt ids'
-        data = client.table("Users").select("id").eq('username',username).execute()
-        userID = data.data[0]['id']
-        data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
-        history = data.data
+    print(3)
+    # Getting the user's id and past prompt ids'
+    data = client.table("Users").select("id").eq('username',username).execute()
+    userID = data.data[0]['id']
+    data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+    history = data.data
         
-        print(4)
-        print(history)
-        for item in range(len(history)):
-            data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
-            # Checking whether past prompt id had an empty prompt
-            if len(data.data) == 0:
-                pass
-            else:
-                # Appending the response data to their respoective prompt id
-                history[item]['response'] = []
-                for book in range(len(data.data)):
-                    history[item]['response'].append(data.data[book])
+    print(4)
+    print(history)
+    for item in range(len(history)):
+        data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
+        # Checking whether past prompt id had an empty prompt
+        if len(data.data) == 0:
+            pass
+        else:
+            # Appending the response data to their respoective prompt id
+            history[item]['response'] = []
+            for book in range(len(data.data)):
+                history[item]['response'].append(data.data[book])
 
-        print(5)
-        print(history)
-        print(6)
-        return history
+    print(5)
+    print(history)
+    print(6)
+    return history
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
@@ -712,16 +713,52 @@ def bad_feedback():
     return data.data, 200
 
 @routes.route('/emailing', methods=['POST'])
-def emailing():
+def emailing(responses):
     # receiver is an email
-    receiver: str = request.form['reciever'] # This is  a string, if many they are separated by commas
+    recepient: str = request.form['reciever'] # This is  a string, if many they are separated by commas
     prompt_asked: str = request.form['prompt_asked'] # is a string
     responses: str = request.form['responses'] # is a list
     username: str = request.form['username']
     
+    titles = []
+    for book in responses:
+        title_author = book['title'] + ' by ' + book['author']
+        titles.append(title_author)
+
+    book_titles = '<br>'.join(titles)
     
+    EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+
+
+    msg = EmailMessage()
+    msg['Subject'] = 'Checkout Bronx'
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = str(recepient)
+    
+    msg.set_content(f'Email by {username} from Bookfinder...')
+    msg.add_alternative(f"""\
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Here are some interesting book suggestions!</h1>
+        <p>Hello! {username} from Bookfinder has sent you some book recommendations they found while using Bookfinder.</p>
+        <h2>Their prompt was: {prompt_asked}</h2>
+        <h3>They were suggested the following books:</h3>
+        <p>
+            {book_titles}
+        </p>
+        <h2>Wanna see more about Bookfinder?</h2>
+            <h2>Visit <a href="https://rico-hackerthon.onrender.com/">Bookfinder</a> for more suggestions of books</h2>
+    </body>
+</html>
+""", subtype='html')
+    
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+
+        smtp.send_message(msg)
 
     return [], 200
-    print()
 
 
