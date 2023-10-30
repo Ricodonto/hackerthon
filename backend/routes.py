@@ -717,6 +717,7 @@ def emailing():
     receiver: str = request.form['reciever'] # This is  a string, if many they are separated by commas
     prompt_asked: str = request.form['prompt_asked'] # is a string
     responses: str = request.form['responses'] # is a list
+    username: str = request.form['username']
     
     
 
