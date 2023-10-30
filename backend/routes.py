@@ -653,7 +653,7 @@ def change_password():
         
         print(6)
         client.table("Users").update({'hashed_password':new_hash}).eq('id', str(user_id)).execute()
-        return {'response': 'f"New password is {new_password}"'}, 200
+        return {'response': f"New password is {new_password}"}, 200
     else:
         error = True
         error_message = "Original Password is incorrect"
