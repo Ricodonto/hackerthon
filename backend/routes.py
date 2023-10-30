@@ -581,7 +581,6 @@ def change_username():
 
     # Check if the username already exists
     data = client.table("Users").select('username', 'id').eq('username', str(new_username)).execute()
-    user_id = data.data[0]['id']
     print(data.data)
     if len(data.data) > 0:
         error = True
@@ -602,9 +601,9 @@ def change_username():
         data = client.table("Users").update({'username': str(new_username)}).eq('username', str(old_username)).execute()
         print(data.data[0]['username'])
 
-    data = client.table("Users").select('username').eq('id', str(user_id)).execute()
+    data = client.table("Users").select('username','id').eq('username', str(new_username)).execute()
     
-    return data
+    return data.data[0]
 
 
 @routes.route('/profile/changepwd', methods=['POST'])
@@ -661,8 +660,13 @@ def change_password():
 
         return {"error": error_message}, 400
 
-@routes.route('/feedback', methods=['POST'])
-def feedback():
+@routes.route('/feedback/good', methods=['POST'])
+def good_feedback():
+    
+    print()
+
+@routes.route('/feedback/bad', methods=['POST'])
+def bad_feedback():
     
     print()
 
