@@ -1,14 +1,16 @@
-import json, re
+import json, re, smtplib, os, imghdr
 from flask import Blueprint, redirect, render_template, request, session
 from chatgpt import ai, cleanup, response_organizer
 from openlibrary import *
 from flask import jsonify
 
 import os
-from supabase_py import create_client
+from supabase import create_client
 import bcrypt
 
 from simplejson.errors import JSONDecodeError
+
+from email.message import EmailMessage
 
 routes = Blueprint(__name__,"route")
 
@@ -23,10 +25,6 @@ def landing():
     #     # username = request.form['username']
     
     # load the landing page if no form is being submitted
-    if request.method == 'GET':
-        print(2)
-        return {}, 200
-    
     if request.method == 'POST':
         print(3)
         # get the prompt from the form submitted
@@ -49,10 +47,10 @@ def landing():
         print(6)
         # userid = client.table("Users").select("id").eq('username',session['username']).execute()
         userid = client.table("Users").select("id").eq('username',username).execute()
-        userid = userid['data'][0]['id']
+        userid = userid.data[0]['id']
         data = client.table("Prompts").insert({"prompt_asked": prompt, "userID": userid}).execute()
         print(data)
-        promptid = data['data'][0]['id']
+        promptid = data.data[0]['id']
         session['prompt'] = promptid
 
         # Prompt GPT for recommendations
@@ -91,7 +89,11 @@ def landing():
                                               "rating":book['rating'],
                                               "image":book['image']}).execute()
         print(response)
-        return response
+        output = {'prompt_id': promptid, 'prompt_asked':prompt, 'response':response}
+        return output
+    else:
+        print(2)
+        return {}, 200
 
 @routes.route("/currently_reading", methods=['POST'])
 def current_list():
@@ -124,9 +126,9 @@ def current_list():
     
     print(5)
     data = client.table("Users").select("id").eq('username', username).execute()
-    userid = data['data'][0]['id']
+    userid = data.data[0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Currently Reading List', "userID": userid,}).execute()
-    promptid = data['data'][0]['id']
+    promptid = data.data[0]['id']
 
     print(6)
     olai(titles)
@@ -160,7 +162,9 @@ def current_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return response
+
+    output = {'prompt_id': promptid, 'prompt_asked':'Already Read List', 'response':response}
+    return output
     
 @routes.route("/want_to_read", methods=['POST'])
 def want_list():
@@ -194,9 +198,9 @@ def want_list():
     
     print(5)
     data = client.table("Users").select("id").eq('username',username).execute()
-    userid = data['data'][0]['id']
+    userid = data.data[0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Want to Read List', "userID": userid,}).execute()
-    promptid = data['data'][0]['id']
+    promptid = data.data[0]['id']
 
     print(6)
     print(titles)
@@ -231,8 +235,9 @@ def want_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    print(response)
-    return response
+
+    output = {'prompt_id': promptid, 'prompt_asked':'Want to Read List', 'response':response}
+    return output
 
 @routes.route("/already_read", methods=['POST'])
 def already_list():
@@ -266,9 +271,9 @@ def already_list():
     
     print(5)
     data = client.table("Users").select("id").eq('username',username).execute()
-    userid = data['data'][0]['id']
+    userid = data.data[0]['id']
     data = client.table("Prompts").insert({"prompt_asked": 'Already Read List', "userID": userid,}).execute()
-    promptid = data['data'][0]['id']
+    promptid = data.data[0]['id']
 
     print(6)
     olai(titles)
@@ -302,7 +307,8 @@ def already_list():
                                           "rating":book['rating'],
                                           "image":book['image']}).execute()
     print(11)
-    return response
+    output = {'prompt_id': promptid, 'prompt_asked':'Already Read List', 'response':response}
+    return output
 
 
 # Route for sign up
@@ -336,9 +342,7 @@ def signup():
         # Create connection to supabase
         print(5)
         url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
-        print(url)
-        print(key)  
+        key = os.environ.get("SUPABASE_KEY") 
         client = create_client(supabase_url=url, supabase_key=key)
 
         print(6)
@@ -346,7 +350,7 @@ def signup():
 
         # If user exists return error
         print(7)
-        if len(user_exist_response['data']) > 0:
+        if len(user_exist_response.data) > 0:
             print(8)
             error = True
             error_message = "User Already Exists"
@@ -357,7 +361,7 @@ def signup():
         print(-7)
         print(username)
         # regular expression check to ensure the username only contains word characters
-        if re.search(r"^[\w]+$", username):
+        if re.search(r"[\w]+", username):
             print("Valid")
 
         else:
@@ -374,8 +378,8 @@ def signup():
 
         # Store in database
         print(10)
-        data, error = client.table("Users").insert({"username": username, "hashed_password": hashed_password}).execute()
-        print(data, error)
+        data = client.table("Users").insert({"username": username, "hashed_password": hashed_password}).execute()
+        print(data.data)
         print(11)
         session['username'] = username
 
@@ -415,7 +419,7 @@ def login():
         print(response)
         
         # Return an error if nothing was found
-        if (len(response['data']) <= 0):
+        if (len(response.data) <= 0):
             print(7)
             # Set error to true
             error = True
@@ -425,9 +429,11 @@ def login():
 
         # Compare hashed passwords
         print(8)
-        hashed_password = response['data'][0]['hashed_password']
+        hashed_password = response.data[0]['hashed_password']
         hashed_password_bytes = hashed_password.encode()
         is_same = bcrypt.checkpw(password=password.encode(), hashed_password=hashed_password_bytes)
+
+        print(is_same)
 
         if is_same == True:
             print(9)
@@ -474,36 +480,35 @@ def history(usr=''):
     # username = request.form['username']
     
     # Checking if the user wishes to view their history
-    if request.method == 'GET':
-        print(2)
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
-        client = create_client(supabase_url=url, supabase_key=key)
+    print(2)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
 
-        print(3)
-        # Getting the user's id and past prompt ids'
-        data = client.table("Users").select("id").eq('username',username).execute()
-        userID = data['data'][0]['id']
-        data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
-        history = data['data']
+    print(3)
+    # Getting the user's id and past prompt ids'
+    data = client.table("Users").select("id").eq('username',username).execute()
+    userID = data.data[0]['id']
+    data = client.table('Prompts').select('id', 'prompt_asked').eq('userID', str(userID)).execute()
+    history = data.data
         
-        print(4)
-        print(history)
-        for item in range(len(history)):
-            data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
-            # Checking whether past prompt id had an empty prompt
-            if len(data['data']) == 0:
-                pass
-            else:
-                # Appending the response data to their respoective prompt id
-                history[item]['response'] = []
-                for book in range(len(data['data'])):
-                    history[item]['response'].append(data['data'][book])
+    print(4)
+    print(history)
+    for item in range(len(history)):
+        data = client.table('Responses').select('book_title', 'isbn', 'author', 'description', 'rating', 'image').eq('prompt_id', str(history[item]['id'])).execute()
+        # Checking whether past prompt id had an empty prompt
+        if len(data.data) == 0:
+            pass
+        else:
+            # Appending the response data to their respoective prompt id
+            history[item]['response'] = []
+            for book in range(len(data.data)):
+                history[item]['response'].append(data.data[book])
 
-        print(5)
-        print(history)
-        print(6)
-        return history
+    print(5)
+    print(history)
+    print(6)
+    return history
 
     # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
@@ -520,40 +525,30 @@ def rm_all_history():
     client = create_client(url, key)
 
     data = client.table("Users").select("id").eq('username',username).execute()
-    user_id = data['data'][0]['id']
+    user_id = data.data[0]['id']
     print(user_id)
     data = client.table('Prompts').select('id').eq('userID', str(user_id)).execute()
     prompts = []
-    for prompt in data['data']:
+    for prompt in data.data:
         prompts.append(str(prompt['id']))
     
 
     print(prompts)
 
-    try:
-        data = client.table("Feedback").delete().in_("prompt_id", prompts).execute()
-    except JSONDecodeError:
-        try:
-            client.table("Logs").delete().in_("prompt_id", prompts).execute()
-        except JSONDecodeError:
-            try:
-                client.table("Responses").delete().in_("prompt_id", prompts).execute()
-            except JSONDecodeError:
-                try:
-                    client.table("Prompts").delete().in_("id", prompts).execute()
-                except JSONDecodeError:
+    client.table("Feedback").delete().in_("prompt_id", prompts).execute()
+    client.table("Logs").delete().in_("prompt_id", prompts).execute()
+    client.table("Responses").delete().in_("prompt_id", prompts).execute()
+    client.table("Prompts").delete().in_("id", prompts).execute()
                     #For testing purposes
-                    print('done')
-                    request.method = 'GET'                    
-                    return history(username)
-    error = True
-    error_message = "Something Went Wrong"
-    # return render_template("login.html", error=error, error_message=error_message)
-    return jsonify({"error": error_message}), 400
+    print('done')
+    request.method = 'GET'                    
+    return history(username)
+
 
 # Route for deleting a specific prompt
 @routes.route('/del_prompt_history', methods=['DELETE'])
 def rm_prompt():
+    print(1)
     prompt_id: str = request.form['prompt_id']
     username:  str = request.form['username']
     
@@ -563,19 +558,245 @@ def rm_prompt():
     client = create_client(url, key)
 
 
-    try:
-        client.table("Feedback").delete().eq("prompt_id", str(prompt_id)).execute()
-    except JSONDecodeError:
-        try:
-            client.table("Logs").delete().eq("prompt_id", str(prompt_id)).execute()
-        except JSONDecodeError:
-            try:
-                client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
-            except JSONDecodeError:
-                try:
-                    client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
-                except JSONDecodeError:
+    print(2)
+    print(3)
+    client.table("Feedback").delete().eq("prompt_id", str(prompt_id)).execute()
+    print(4)
+    client.table("Logs").delete().eq("prompt_id", str(prompt_id)).execute()
+    print(5)
+    client.table("Responses").delete().eq("prompt_id", str(prompt_id)).execute()
+    print(6)
+    client.table("Prompts").delete().eq("id", str(prompt_id)).execute()
                     # For testing purposes
-                    request.method = 'GET'
-                    return history(username)
+    print(7)
+    request.method = 'GET'
+    return history(username)
+
+
+@routes.route('/profile/changeusr', methods=['POST'])
+def change_username():
+    error = False
+    error_message = ""
+
+    old_username: str = request.form['old_username']
+    new_username: str = request.form['new_username']
+    
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+
+    # Check if the username already exists
+    data = client.table("Users").select('username', 'id').eq('username', str(new_username)).execute()
+    print(data.data)
+    if len(data.data) > 0:
+        error = True
+        error_message = 'Username already taken'
+
+        return jsonify({"error": error_message}), 400
+    elif re.search(r"[\W]+", new_username):
+        error = True
+        error_message = 'Username invalid'
+
+        return jsonify({"error": error_message}), 400
+    elif len(new_username) <= 0:
+        error = True
+        error_message = 'Enter a new username'
+
+        return jsonify({"error": error_message}), 400
+    else:
+        data = client.table("Users").update({'username': str(new_username)}).eq('username', str(old_username)).execute()
+        print(data.data[0]['username'])
+
+    data = client.table("Users").select('username','id').eq('username', str(new_username)).execute()
+    
+    return data.data[0]
+
+
+@routes.route('/profile/changepwd', methods=['POST'])
+def change_password():
+    error = False
+    error_message = ""
+
+    username: str = request.form['username']
+    old_password: str = request.form['old_password']
+    new_password: str = request.form['new_password']
+    confirm_new: str = request.form['confirm_new']
+
+
+    if len(new_password) == 0 or len(old_password) == 0:
+        error = True
+        error_message = "Empty Password field"
+
+        return {"error": error_message}, 400
+
+    if new_password != confirm_new:
+        error = True
+        error_message = "Passwords do not match"
+
+        return {"error": error_message}, 400
+    
+
+    print(2)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+
+    print(3)
+    data = client.table("Users").select('id', 'hashed_password').eq('username', str(username)).execute()
+    user_id = data.data[0]['id']
+    hashed_password = data.data[0]['hashed_password']
+    old_password_bytes = old_password.encode()
+    
+    print(4)
+    is_same = bcrypt.checkpw(old_password_bytes, hashed_password.encode())
+
+    if is_same:
+        print(5)
+        new_password_bytes = new_password.encode('utf-8')
+        salt = bcrypt.gensalt(rounds=15)
+        new_hash = bcrypt.hashpw(new_password_bytes, salt)
+        new_hash = new_hash.decode()
+        
+        print(6)
+        client.table("Users").update({'hashed_password':new_hash}).eq('id', str(user_id)).execute()
+        return {'response': f"New password is {new_password}"}, 200
+    else:
+        error = True
+        error_message = "Original Password is incorrect"
+
+        return {"error": error_message}, 400
+
+@routes.route('/delete_usr', methods=['DELETE'])
+def delete_usr():
+    error = False
+    error_message = ""
+    
+    username:  str = request.form['username']
+
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(url, key)
+
+    data = client.table("Users").select("id").eq('username',username).execute()
+    user_id = data.data[0]['id']
+    print(user_id)
+    data = client.table('Prompts').select('id').eq('userID', str(user_id)).execute()
+    prompts = []
+    for prompt in data.data:
+        prompts.append(str(prompt['id']))
+    
+
+    print(prompts)
+
+    client.table("Feedback").delete().in_("prompt_id", prompts).execute()
+    client.table("Logs").delete().in_("prompt_id", prompts).execute()
+    client.table("Responses").delete().in_("prompt_id", prompts).execute()
+    client.table("Prompts").delete().in_("id", prompts).execute()
+    client.table("Users").delete().eq("id", str(user_id)).execute()
+                    #For testing purposes
+    print('done')
+    return [], 200
+
+@routes.route('/feedback/good', methods=['POST'])
+def good_feedback():
+    prompt_id: str = request.form['prompt_id']
+    username: str = request.form['username']
+
+    print(1)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+
+    print(2)
+    data = client.table("Users").select('id').eq('username', str(username)).execute()
+    user_id = data.data[0]['id']
+
+    print(3)
+    data = client.table("Logs").select('id').eq('prompt_id', str(prompt_id)).execute()
+    log_id = data.data[0]['id']
+
+    print(4)
+    data = client.table("Feedback").insert({"prompt_id": str(prompt_id), "user_id": str(user_id), 'log_id':str(log_id), 'opinion': 'Yes'}).execute()
+    
+    return data.data, 200
+
+@routes.route('/feedback/bad', methods=['POST'])
+def bad_feedback():
+    prompt_id: str = request.form['prompt_id']
+    username: str = request.form['username']
+
+    print(1)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
+
+    print(2)
+    data = client.table("Users").select('id').eq('username', str(username)).execute()
+    user_id = data.data[0]['id']
+
+    print(3)
+    data = client.table("Logs").select('id').eq('prompt_id', str(prompt_id)).execute()
+    log_id = data.data[0]['id']
+
+    print(4)
+    data = client.table("Feedback").insert({"prompt_id": str(prompt_id), "user_id": str(user_id), 'log_id':str(log_id), 'opinion': 'No'}).execute()
+    
+    return data.data, 200
+
+@routes.route('/emailing', methods=['POST'])
+def emailing():
+    # receiver is an email
+    print(1)
+    recepient: str = request.form['reciever'] # This is  a string, if many they are separated by commas
+    prompt_asked: str = request.form['prompt_asked'] # is a string
+    responses: str = request.form['responses'] # is a list
+    username: str = request.form['username']
+    
+    print(2)
+    titles = []
+    for book in responses:
+        title_author = book['title'] + ' by ' + book['author']
+        titles.append(title_author)
+
+    print(3)
+    book_titles = '<br>'.join(titles)
+    
+    EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
+    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+
+
+    print(4)
+    msg = EmailMessage()
+    msg['Subject'] = 'Checkout Bronx'
+    msg['From'] = EMAIL_ADDRESS
+    msg['To'] = str(recepient)
+    
+    print(5)
+    msg.set_content(f'Email by {username} from Bookfinder...')
+    msg.add_alternative(f"""\
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Here are some interesting book suggestions!</h1>
+        <p>Hello! {username} from Bookfinder has sent you some book recommendations they found while using Bookfinder.</p>
+        <h2>Their prompt was: {prompt_asked}</h2>
+        <h3>They were suggested the following books:</h3>
+        <p>
+            {book_titles}
+        </p>
+        <h2>Wanna see more about Bookfinder?</h2>
+            <h2>Visit <a href="https://rico-hackerthon.onrender.com/">Bookfinder</a> for more suggestions of books</h2>
+    </body>
+</html>
+""", subtype='html')
+    
+    print(6)
+    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+
+        smtp.send_message(msg)
+
+    print(7)
+    return [], 200
+
 
