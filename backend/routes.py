@@ -9,7 +9,9 @@ from supabase import create_client
 import bcrypt
 
 from simplejson.errors import JSONDecodeError
-
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from email.message import EmailMessage
 
 routes = Blueprint(__name__,"route")
@@ -726,58 +728,73 @@ def bad_feedback():
 
 @routes.route('/emailing', methods=['POST'])
 def emailing():
-    # receiver is an email
-    print(1)
-    recepient: str = request.form['reciever'] # This is  a string, if many they are separated by commas
-    prompt_asked: str = request.form['prompt_asked'] # is a string
-    responses: str = request.form['responses'] # is a list
-    username: str = request.form['username']
+    error = False
+    error_message = ""
     
-    print(2)
-    titles = []
-    for book in responses:
-        title_author = book['title'] + ' by ' + book['author']
-        titles.append(title_author)
-
-    print(3)
-    book_titles = '<br>'.join(titles)
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    client = create_client(supabase_url=url, supabase_key=key)
     
-    EMAIL_ADDRESS = os.environ.get('EMAIL_ADDRESS')
-    EMAIL_PASSWORD = os.environ.get('EMAIL_PASSWORD')
-
-
-    print(4)
-    msg = EmailMessage()
-    msg['Subject'] = 'Checkout Bronx'
-    msg['From'] = EMAIL_ADDRESS
-    msg['To'] = str(recepient)
+    try:
+        # Receiver is an email
+        receiver = request.form['receiver']
+        prompt_asked = request.form['prompt_asked']
+        
+        # Fetch the prompt_id from the "Prompts" table
+        prompt_id = None
+        prompt_data = client.table("Prompts").select("id").eq("prompt_asked", prompt_asked).execute()
+        if prompt_data.data:
+            prompt_id = prompt_data.data[0]['id']
+        
+        # Fetch recommendations based on the prompt_id
+        recommendations = []
+        if prompt_id:
+            response_data = client.table("Responses").select("book_title").eq("prompt_id", prompt_id).execute()
+            recommendations = [response.get('book_title') for response in response_data.data]
+        
+        if len(receiver) == 0:
+            raise Exception("Please enter your email")
+        
+        EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS")
+        EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+        
+        # Create an email message
+        msg = MIMEMultipart()
+        msg['From'] = EMAIL_ADDRESS
+        msg['To'] = receiver
+        msg['Subject'] = "Your Prompt and Recommendations"
     
-    print(5)
-    msg.set_content(f'Email by {username} from Bookfinder...')
-    msg.add_alternative(f"""\
-<!DOCTYPE html>
-<html>
-    <body>
-        <h1>Here are some interesting book suggestions!</h1>
-        <p>Hello! {username} from Bookfinder has sent you some book recommendations they found while using Bookfinder.</p>
-        <h2>Their prompt was: {prompt_asked}</h2>
-        <h3>They were suggested the following books:</h3>
-        <p>
-            {book_titles}
-        </p>
-        <h2>Wanna see more about Bookfinder?</h2>
-            <h2>Visit <a href="https://rico-hackerthon.onrender.com/">Bookfinder</a> for more suggestions of books</h2>
-    </body>
-</html>
-""", subtype='html')
+        # Add the prompt to the email body
+        prompt_text = f"Prompt: {prompt_asked}\n"
+        msg.attach(MIMEText(prompt_text, 'plain'))
     
-    print(6)
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+        # Add recommendations to the email body
+        recommendations_text = "Recommendations:\n"
+        for i, response in enumerate(recommendations, start=1):
+            recommendations_text += f"{i}. {response.strip()}\n"
+        msg.attach(MIMEText(recommendations_text, 'plain'))
+    
+        # Connect to the SMTP server (in this case, Gmail)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        
+        # Login using your email address and app password
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+    
+        # Send the email
+        server.sendmail(EMAIL_ADDRESS, receiver, msg.as_string())
+    
+        # Close the SMTP connection
+        server.quit()
+    
+    except Exception as e:
+        error = True
+        error_message = str(e)
 
-        smtp.send_message(msg)
+    if error:
+        return {"error": error_message}, 400
+    else:
+        return {"message": "Email sent successfully"}, 200
 
-    print(7)
-    return [], 200
 
 
