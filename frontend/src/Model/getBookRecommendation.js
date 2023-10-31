@@ -17,7 +17,7 @@ export async function getBookRecommendation(prompt) {
         console.log("Fetch Completed!")
         let json = await response.json();
         console.log("JSON IS: ")
-        console.log(json)
+        
         if (response.status !== 200) {
             console.log(json);
             if (json['error'] !== null) {
@@ -27,7 +27,6 @@ export async function getBookRecommendation(prompt) {
                 throw new Error("Could Not Get Recommendation")
             }
         }
-
         return json;
     } catch(err) {
         console.log(err);

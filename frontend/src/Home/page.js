@@ -11,7 +11,7 @@ import ErrorWidget from '../Components/errorWidget';
 import LoadingScreen from '../Components/loadingScreen';
 
 export default function Home() {
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState({response: [], prompt_id: 0, prompt_asked: ""});
     const [prompt, setPrompt] = useState("");
     const [loading, setLoading] = useState(false);
     const [loadingMessage, setLoadingMessage] = useState("");
@@ -105,9 +105,9 @@ export default function Home() {
     }
 
     if (loading === true) {
-        return <ErrorWidget message={errorMessage} />;
-    } else if (error === true) {
         return <LoadingScreen message={loadingMessage} />;
+    } else if (error === true) {
+        return <ErrorWidget message={errorMessage} />;
     } else {
         return (
             <div className='content-page'>
@@ -206,7 +206,7 @@ export default function Home() {
                 {/* Search Results */}
                 <section className='search-results'>
                     <div className='search-results-header'>
-                        <h2>Search Results</h2>
+                        <h2>Search Results for: {searchResults.prompt_asked}</h2>
                         <div className='search-results-share'>
                             <MyButton 
                                 text={'Share'}
@@ -228,7 +228,7 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {searchResults.map((val, index) => {
+                    {searchResults.response.map((val, index) => {
                         return <SearchResult
                             key={index}
                             title={val.title}
@@ -275,7 +275,6 @@ function SearchResult(props) {
             <p style={{ flex: 2 }}>{props.author}</p>
             <p style={{ flex: 1 }}>{props.rating}</p>
             <p style={{ flex: 3 }}>{props.description}</p>
-            <MyButton text={'Summary'} handleClick={props.handleShowSummary} />
             <MyButton text={'More Info'}
                 handleClick={() => {
                     window.open(props.moreInfoLink, "_blank")
