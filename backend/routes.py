@@ -20,12 +20,7 @@ routes = Blueprint(__name__,"route")
 @routes.route("/", methods=['GET', 'POST'])
 def landing():
     username: str = request.form['username']
-    # # Check whether there is a signed in username in session
-    # if 'username' not in list(session.keys()):
-    #     # return redirect('/signup')
-    #     return jsonify({"error": "Not Logged In"}), 400
-    #     # username = request.form['username']
-    
+
     # load the landing page if no form is being submitted
     if request.method == 'POST':
         print(3)
@@ -426,7 +421,6 @@ def login():
             # Set error to true
             error = True
             error_message = "Invalid Credentials"
-            # return render_template("login.html", error=error, error_message=error_message)
             return jsonify({"error": error_message}), 400
 
         # Compare hashed passwords
@@ -450,7 +444,6 @@ def login():
             error = True
             error_message = "Invalid Credentials"
             # Show error screen
-            # return render_template("login.html", error=error, error_message=error_message)
             return {"error": error_message}, 400
 
 # Route for about
@@ -469,18 +462,7 @@ def history(usr=''):
         username = usr
     else:
         username:  str = request.form['username']
-    # # Checking if username is in the current session
-    # if 'username' not in list(session.keys()):
-    #     return redirect('/signup')
-    #     # return jsonify({"error": "Not Logged In"}), 400
-    #     # username = request.form['username']    
-    # # if "username" not in session:
-    # #     return redirect('/login')
-    # if len(request.form['username']) <= 0:
-    #     # return redirect('/login')
-    #     return jsonify({"error": "Not Logged In"}), 400
-    # username = request.form['username']
-    
+
     # Checking if the user wishes to view their history
     print(2)
     url = os.environ.get("SUPABASE_URL")
@@ -512,7 +494,6 @@ def history(usr=''):
     print(6)
     return history
 
-    # if someone sends a POST request they will delete the history, allow specific history to be deleted
 
 # Route to delete all of the user's history
 @routes.route('/del_all_history', methods=['DELETE'])
