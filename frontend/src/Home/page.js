@@ -9,6 +9,8 @@ import { alreadyReading } from '../Model/alreadyRead';
 import { wantToRead } from '../Model/wantToRead';
 import ErrorWidget from '../Components/errorWidget';
 import LoadingScreen from '../Components/loadingScreen';
+import { goodFeedback } from '../Model/goodFeedback';
+import { badFeedback } from '../Model/badFeedback';
 
 export default function Home() {
     const [searchResults, setSearchResults] = useState({response: [], prompt_id: 0, prompt_asked: ""});
@@ -26,6 +28,27 @@ export default function Home() {
         const newSearchResults = searchResults.slice()
         newSearchResults[i].showSummary = !newSearchResults[i].showSummary;
         setSearchResults(newSearchResults)
+    }
+
+    async function handleFeedback(good) {
+        try {
+            // Give arguements
+            let username = sessionStorage.getItem('username')
+            let prompt_id = searchResults.prompt_id
+
+            setLoading(true)
+            setLoadingMessage("Sending Feedback")
+            if (good === true) {
+                await goodFeedback(username, prompt_id)
+            } else {
+                await badFeedback(username, prompt_id)
+            }
+            setLoading(false)
+            setLoadingMessage("")
+        } catch(err) {
+            setError(true)
+            setErrorMessage("Could Not Give Good Feedback")
+        }
     }
 
     async function handleSubmit(event) {
@@ -217,12 +240,12 @@ export default function Home() {
                                 <MyButton
                                     text={"Yes"}
                                     small={true}
-                                    handleClick={() => console.log("Yes")}
+                                    handleClick={() => handleFeedback(true)}
                                 />
                                 <MyButton
                                     text={"No"}
                                     small={true}
-                                    handleClick={() => console.log("No")}
+                                    handleClick={() => handleFeedback(false)}
                                 />
                             </div>
                         </div>
